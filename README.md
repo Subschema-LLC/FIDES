@@ -1,1 +1,133 @@
-# fides
+# FIDES
+
+**Every unit keeps its word.**
+
+FIDES is a way to structure software so it stays simple, readable and
+encapsulated, for the people who write it and for the AI agents that help
+them. It works in any programming language.
+
+> **Status:** draft 0.1. The rules are being tested against real apps and
+> will change.
+
+## The problem
+
+Most codebases are organized by kind of code: controllers in one folder,
+services in another, then repositories, implementations, DTOs, mappers,
+events, listeners and templates. To understand one thing, like "enroll a
+student", you open a dozen folders. Inheritance chains add more places to
+look. Frameworks pull every project toward that scattered shape, and AI agents
+copy whatever shape they find.
+
+FIDES organizes code by what it does and who owns it, keeps each concept in
+one place, and enforces a short list of rules with an automated check.
+
+## The idea in one minute
+
+- **One concept, one place.** A use case lives in one folder: its logic, its
+  view, its CSS.
+- **One owner.** Every piece of data has exactly one owner, and only the owner
+  changes it.
+- **Dependencies point inward,** toward the rules that are true everywhere.
+  The outside world stays at the edges.
+- **No inheritance.** Small units are composed, never extended.
+- **Rules are required, tools are examples.** FIDES says what must be true,
+  not which library to use.
+
+**The test:** a new developer, or an AI agent, understands any feature in
+five minutes, and you can come back after six months and find your way.
+
+## The five zones
+
+| Zone | Holds | Example |
+|---|---|---|
+| **F**eatures | one use case per folder, with its view and assets | `features/enroll/` |
+| **I**ntegrations | how the app reaches the world: database, email, clock | `integrations/database/` |
+| **D**elivery | how the world reaches the app: web, API, CLI, worker | `delivery/web/` |
+| **E**ntities | the rules that are true everywhere | `entities/course/` |
+| **S**hared | contracts that no single entity owns | `shared/unit_of_work` |
+
+Outside `src/`, a `config/` folder holds the setting overrides that belong to
+whoever runs the app.
+
+*Fides* is also Latin for good faith: keeping your word. Every unit promises
+something through its contract and keeps that promise. The acronym is a memory
+aid, not a constraint. If a zone is ever added or renamed, the name stays.
+(FIDES is unrelated to Ethyca's Fides privacy platform.)
+
+## The shape
+
+```
+AGENTS.md            # the rules on one page, for AI agents and people
+config/              # overrides only, one file per owner
+src/
+  shared/            # ownerless contracts: UnitOfWork, Clock, Mailer, MessageBus
+  entities/
+    course/          # Course, its values, messages, settings, store contract
+    student/
+  features/
+    enroll/          # the use case, its view, its CSS
+    transfer/
+  integrations/
+    database/        # fulfills the store contracts
+    email/
+  delivery/
+    web/  cli/  worker/
+    wiring           # the only file that knows integrations exist
+```
+
+Dependencies point one way. Delivery uses features, features use entities,
+integrations fulfill the contracts entities and shared declare, and only
+wiring sees integrations. Folder and file names follow your language's
+conventions.
+
+## Where FIDES fits
+
+**Good fit**
+- Server-side web apps and APIs
+- Monoliths and modular monoliths with a database
+- The backend behind a single-page or mobile app
+- CLIs and background workers that share rules with a web app
+- One service inside a larger system
+
+**Poor fit**
+- The single-page app itself (React, Vue, Svelte) and other rich clients
+  such as mobile and desktop apps. Client code is mostly component state and
+  rendering, its frameworks bring their own structure, and FIDES ideas like
+  stores, transactions and an outbox have nothing to attach to. Feature
+  folders and composition over inheritance still carry over.
+- Libraries and SDKs, small scripts, data pipelines and game engines.
+
+More in [docs/why.md](docs/why.md).
+
+## Read more
+
+1. [Why FIDES](docs/why.md): goals, fit, costs and prior art
+2. [Structure](docs/structure.md): the zones, imports and spread
+3. [Rules](docs/rules.md): every rule, with its reason
+4. [Changes and messages](docs/changes.md): transactions, the outbox, concurrency
+5. [Configuration](docs/configuration.md): defaults, overrides, environment
+6. [Working with AI](docs/ai.md): AGENTS.md, the build check, reading order
+7. [Language notes](docs/languages.md): FIDES in PHP, Python, TypeScript, Java,
+   C#, Go and Rust
+
+## Example
+
+[examples/course-enrollment](examples/course-enrollment) is a small Python app
+(standard library only) where students enroll in, drop and transfer between
+courses. It shows every rule in working code, with 31 tests and an
+architecture check.
+
+```bash
+cd examples/course-enrollment
+python3 run_tests.py          # architecture check + tests
+python3 app.py serve          # http://127.0.0.1:8080
+```
+
+## Contributing
+
+The most useful contribution is a real case where a rule got in the way. Open
+an issue with the code, the rule and what you did instead.
+
+---
+
+AI transparency: Co-created by the author and AI.

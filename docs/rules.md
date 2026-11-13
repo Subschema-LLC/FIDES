@@ -1,0 +1,129 @@
+# The rules
+
+These are all of FIDES's rules. Each comes with the reason for it. Rules
+marked **(checkable)** can be enforced by a script in the build; the example's
+`arch_check.py` checks all of them.
+
+**The test behind every rule:** a new developer or an AI agent understands any
+feature in five minutes, and you can come back after six months and find your
+way.
+
+## Ownership
+
+**1. One owner.** Only the unit that owns data changes it. Everything else asks
+through the owner's actions (`course.enroll(...)`), never by setting its
+fields. Reading through read-only accessors is fine.
+*Why: when data is wrong, there is one place to look.*
+
+**2. Ownership follows consistency.** An entity owns everything it must keep
+consistent and saves it in one write. A Course owns its enrollments because
+the seats taken must always match them.
+*Why: a rule can never be half-applied.*
+
+**3. Entities stand alone.** An entity imports only its own folder. It refers
+to other entities by identity (an id or a key), never by holding them.
+**(checkable)**
+*Why: any entity can be read, tested and changed without opening another.*
+
+## Features
+
+**4. One use case per feature folder,** named as an action and readable top to
+bottom. Its view, CSS and scripts sit beside it. Rules that involve two
+entities live here, because neither entity owns them.
+*Why: one concept, one place.*
+
+**5. Features never call each other.** When one thing should follow another,
+the first records a message and a second feature reacts to it. **(checkable)**
+*Why: each feature can be understood and removed on its own.*
+
+## Boundaries
+
+**6. The core is pure.** Entities, features and shared never touch the
+database, files, network, environment variables or the clock directly. They
+state what they need as contracts. Features get the time from a `Clock`
+contract and pass it into entities. **(checkable)**
+*Why: the core can be tested in milliseconds with no setup, and the outside
+world can change without touching a rule.*
+
+**7. Dependencies point inward.** Delivery uses features, features use
+entities and shared, integrations fulfill contracts from entities and shared.
+Only wiring knows integrations exist. See the table in
+[structure.md](structure.md#import-direction). **(checkable)**
+*Why: the parts that change most often (the edges) depend on the parts that
+change least (the rules), never the reverse.*
+
+**8. No inheritance.** Compose small units. Contracts are interfaces,
+protocols or traits, and implementations fulfill them without extending
+anything. If a framework forces you to subclass one of its types, keep that
+class at the edge (delivery or integrations), thin and with no rules in it.
+**(checkable)**
+*Why: what a unit does is in the unit, not spread up a chain of parents.*
+
+## Change
+
+**9. One write by default.** A store's save writes the entity, its children and
+its messages in one transaction. A feature that changes two entities asks for
+a `UnitOfWork` in its constructor, so the exception is visible to every
+reader. Saves check a version so two simultaneous changes cannot both win.
+*Why: changes are all or nothing, and the rare multi-entity change is obvious.*
+
+**10. Messages are recorded, saved, then dispatched.** Entities record what
+happened. Stores save messages in the same write as the change. A worker
+dispatches them after commit. Nothing is ever sent from inside a change, and
+every handler is safe to run twice.
+*Why: a failed email cannot undo an enrollment, and a rolled-back enrollment
+never sends one.*
+
+Details: [changes.md](changes.md).
+
+## Configuration
+
+**11. Settings are declared by their owner and overridden from outside.** The
+owner declares every setting in code with its default and its rules. Overrides
+live in `config/`, outside the source tree, one file per owner. Environment
+variables win over the file. Everything is merged once at startup and frozen.
+Unknown keys and invalid values stop startup. Secrets come from the
+environment only.
+*Why: code updates never overwrite an operator's settings, typos fail loudly,
+and there is one answer to "where did this value come from?"*
+
+**12. The database holds transactional and reporting data, never
+configuration.**
+*Why: configuration that hides in a table cannot be reviewed, versioned or
+reproduced.*
+
+Details: [configuration.md](configuration.md).
+
+## Presentation
+
+**13. Views only display.** A view gets plain values shaped by its feature,
+never fetches data and holds no business rules. Output is escaped by default,
+and unescaped output is explicit and rare. Pages are composed in delivery,
+never by one feature's view pulling in another's. Prefer a logic-less
+template language (Mustache-style) so the template cannot break this rule.
+*Why: a view that can only display cannot hide a rule or a security hole.*
+
+## Size and spread
+
+**14. One concept, one place.** A change touches its feature folder, the
+entities that feature names, at most one integration, and wiring. If it needs
+more, a concept is spread too far.
+*Why: the cost of a change is mostly the cost of finding everything it
+touches.*
+
+**15. Small and shallow.** Never deeper than `zone/owner/file`. Files stay
+under about 200 lines, lines under about 100 characters. Split by concept,
+never by kind of code. **(checkable)**
+*Why: code you can see whole is code you can understand whole.*
+
+## Practice
+
+**16. Rules are required, tools are examples.** FIDES names what must be true,
+never which framework, database or template engine to use. Follow your
+language's own conventions for naming and syntax.
+*Why: the rules outlive the tools.*
+
+**17. Enforce mechanically.** The import rules run as a check in the build, and
+an `AGENTS.md` states the rules on one page.
+*Why: a written rule is a request. A failing build is the part nobody, human
+or AI, can quietly skip.*

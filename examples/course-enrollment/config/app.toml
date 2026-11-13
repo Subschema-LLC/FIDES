@@ -1,0 +1,7 @@
+# Overrides for AppSettings (src/shared/app_settings.py).
+# Only keys AppSettings declares may appear here. Anything else stops startup.
+# Environment variables win over this file (e.g. APP_TITLE="Fall Registration").
+# Never put a secret in this file. Secrets come from the environment only.
+
+title = "Course Enrollment (FIDES example)"
+mail_from = "registrar@example.edu"
