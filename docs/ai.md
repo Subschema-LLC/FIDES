@@ -1,0 +1,84 @@
+# Working with AI
+
+FIDES was designed for teams where people and AI agents work in the same
+codebase. The properties that help a new developer help an agent even more.
+
+## Why the shape helps agents
+
+- **Small, complete context.** A feature folder plus the entities it names is
+  everything an agent needs to read. It does not have to search a dozen
+  layers to find the pieces.
+- **Contracts say what is possible.** An agent writing a feature sees exactly
+  which stores and services it may use, by reading the constructor.
+- **One obvious place for new code.** "Something a user does" is always a new
+  feature folder. Agents stop inventing new layers.
+- **Good code to imitate.** Agents copy the nearest example. When every
+  feature has the same shape, the nearest example is a correct one.
+- **Rules a machine can check.** An agent can run the check itself and fix
+  what it broke before you ever see it.
+
+## Two things every FIDES repo needs
+
+**1. An `AGENTS.md` at the root.** The rules on one page, plus where new code
+goes and what to run before finishing. Agents read it first; people coming
+back after months away should too. Keep it short: if it does not fit on a
+page, it will not be followed.
+
+**2. A check in the build.** The import rules, purity, no inheritance and the
+size limits, enforced by a script or tool that fails the build. A written
+rule is a request. A failing build is the part nobody can quietly skip. Six
+months from now, an agent will "helpfully" import a database class into a
+feature to save a step. The check is what stops it.
+
+## AGENTS.md template
+
+Adapt the names to your language and app. The example app's
+[AGENTS.md](../examples/course-enrollment/AGENTS.md) is a filled-in version.
+
+```markdown
+# AGENTS.md
+
+This app follows FIDES. Run `<check command>` before you finish.
+
+## Where code goes
+- A rule always true for a concept      -> its folder in src/entities/
+- Something a user or system does       -> a new folder in src/features/
+- A new way the world reaches the app   -> src/delivery/
+- A new way the app reaches the world   -> src/integrations/, behind a contract
+- A contract no single entity owns      -> src/shared/
+- A setting                             -> declared in the owner's settings
+- An override for a setting             -> config/<Owner> (never in src/)
+
+## Rules
+1. Only the owner changes its data. Others call its actions.
+2. Entities import only their own folder. Refer to other entities by id.
+3. One use case per feature folder. Features never import each other.
+4. The core never touches the database, files, network, environment or clock.
+5. Dependencies point inward. Only wiring imports integrations.
+6. No inheritance. Compose. Contracts are interfaces.
+7. Messages: entities record, stores save with the change, a worker dispatches.
+8. One write by default. UnitOfWork only when two entities change.
+9. Settings: declared in code, overridden in config/, then env. Secrets: env only.
+10. Views only display. Escaped by default. Composed in delivery.
+11. At most zone/owner/file deep. Small files, short lines.
+
+If a change touches more than its feature folder, the entities it names,
+one integration and wiring, stop and ask whether something is spread too far.
+```
+
+## Reading order for a returning human or a new agent
+
+1. `AGENTS.md`: the rules, in one page.
+2. `config/`: what this installation is set up to do.
+3. One feature folder that changes two entities: it shows every rule at once.
+4. `delivery/wiring`: the one place that shows how everything connects.
+5. The feature folder for whatever you need to change.
+
+## Prompting tips
+
+- Name the feature folder: "Add a waitlist to `features/enroll`" gives the
+  agent its whole context in one phrase.
+- Ask for the check: "Run the architecture check and the tests before you
+  finish."
+- When an agent wants to add a new zone, layer or "helpers" folder, treat it
+  as a design question, not a code change.

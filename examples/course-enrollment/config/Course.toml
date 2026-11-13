@@ -1,0 +1,5 @@
+# Overrides for CourseSettings (src/entities/course/course_settings.py).
+# Sparse on purpose: only what differs from the declared defaults.
+# Environment variables win over this file (e.g. COURSE_TRANSFERS_OPEN=false).
+
+max_courses_per_student = 3

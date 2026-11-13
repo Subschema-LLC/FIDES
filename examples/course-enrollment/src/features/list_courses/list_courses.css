@@ -1,0 +1,5 @@
+.courses table { border-collapse: collapse; width: 100%; }
+.courses th, .courses td { text-align: left; padding: 0.4rem 0.6rem; }
+.courses td { border-top: 1px solid #ddd; }
+.courses tr.full td { color: #8a1c1c; }
+.courses tr.open td:last-child { font-weight: 600; }
