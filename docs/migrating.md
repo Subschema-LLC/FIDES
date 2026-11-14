@@ -56,16 +56,18 @@ put an item in that state.
 When a variant finds something, turn it into an integration test. The
 comparisons are scaffolding for the move; the tests are what stays.
 
-## Split one big stylesheet carefully
+## Split one big stylesheet or script carefully
 
-Older apps often have one global stylesheet. FIDES puts each rule with the
-markup it styles, which changes the order rules load in.
+Older apps often have one global stylesheet and one global script. FIDES puts
+each style rule and script with the markup it owns, which changes the order
+rules load in.
 
 - **Find where each rule applies.** Load every page and every variant in a
   real browser and record which selectors match.
-- **Move each rule to the owner of its markup.** A feature's view gets the
-  feature's CSS. The page template gets the page's CSS. Rules for the frame,
-  or matched on many pages by shared markup, stay in the layout.
+- **Move each rule and script to the owner of its markup.** A feature's view
+  gets the feature-specific `.css` and `.js`. The page folder gets the
+  page-specific `.css` and `.js`. Global styles and scripts for the frame, or
+  matched on many pages by shared markup, stay in the layout.
 - **Watch the cascade.** Feature files load after the layout. A rule that used
   to come earlier and lose can now come later and win. In the production app,
   a rule for bulk actions moved into a feature file and started overriding the

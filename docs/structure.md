@@ -26,9 +26,9 @@ identity (an id or key), never by holding them.
 ### Features
 
 One use case per folder, named as an action: `enroll`, `transfer`,
-`list_courses`. The folder holds the use case, plus its views, CSS and
-scripts if it shows anything. The use case reads top to bottom. A feature
-with a view also shapes the plain values that view prints.
+`list_courses`. The folder holds the use case, plus its views and any
+feature-specific CSS and JS if it shows anything. The use case reads top to
+bottom. A feature with a view also shapes the plain values that view prints.
 
 Features import entities and shared. They never import another feature,
 an integration or delivery. Rules that involve two entities ("an inactive
@@ -65,23 +65,27 @@ It is the only file that knows integrations exist.
 
 #### Pages
 
-A web delivery with more than one or two pages gives each page a folder. The
+Each page in web delivery gets its own folder in `delivery/web/<page>/`. The
 page is the unit of web delivery, the way a use case is the unit of features.
 
 ```
 delivery/web/
-  layout              # the frame every page sits in, with its CSS and scripts
-  renderer            # escapes by default, loads feature assets
+  layout              # the outer frame every page sits in
+  layout.css          # global styles for the frame
+  layout.js           # global scripts for the frame
+  renderer            # escapes by default, loads layout, feature and page assets
   routes              # paths to pages
   board/
     board             # page code: reads the request, calls features, responds
     board_view        # page template: lays out the page, places feature views
-    board_view.css    # only for markup the page template prints itself
+    board.css         # page-specific styles for markup the page template prints
+    board.js          # page-specific scripts for this page and its layout
 features/
   show_board/
     show_board        # the use case, and the plain values its views print
     board_view        # a feature view
-    show_board.css    # loads whenever one of this feature's views renders
+    show_board.css    # feature-specific styles; loads when a view here renders
+    show_board.js     # feature-specific scripts; loads when a view here renders
   manage_board_items/
     manage_board_items
     add_card_form     # the form belongs to the feature that handles it
@@ -105,17 +109,38 @@ How a page is put together:
 - **One-button actions can sit in any view.** A button that posts nothing but
   an id (mark done, delete) has no fields for a feature to own. A slot per
   button would cost more than it saves.
-- **Assets load with their views.** A feature's CSS and scripts load when one
-  of its views renders on the page: the layout's first, then each feature's
-  in the order they first rendered, then the page's own. Delivery never keeps
-  a list of which page needs which stylesheet, so a feature cannot appear
-  without its styling.
-- **Page CSS styles only what the page template prints.** If a rule targets a
-  feature's markup, it belongs in that feature's CSS.
+- **Three levels of CSS and JS: global in layout, feature-specific in
+  features, page-specific in page folders.**
+  - **Layout (`delivery/web/layout.css`, `layout.js`)** holds global styles
+    and scripts for the outer frame (navigation, flash messages, shared page
+    shell) that every page uses.
+  - **Features (`features/<feature>/<feature>.css`, `<feature>.js`)** hold
+    feature-specific styles and scripts for the markup and interactions that
+    feature's views own. They travel with the feature wherever its view is
+    placed.
+  - **Page folders (`delivery/web/<page>/<page>.css`, `<page>.js`)** hold
+    page-specific styles and scripts: CSS for markup the page template prints
+    itself, and JS that belongs to that page alone or coordinates between the
+    features placed on it. If a style rule or script targets one feature's own
+    markup or behavior, it belongs in that feature's folder so any page that
+    places the feature gets it too.
+- **Assets load with their views, in render order.** A feature's CSS and JS
+  load automatically when one of its views renders on the page: the layout's
+  global assets first, then each feature's in the order the features first
+  rendered, then the page folder's own assets last. Delivery never keeps a
+  hand-written list of which page needs which feature stylesheet or script, so
+  a feature cannot appear without its styling or behavior, and page-specific
+  assets always load after the features they arrange.
 
-Serve feature assets from their folders (through the app, or copied by a
-build step) rather than inlining them. Separate files keep a strict
-Content-Security-Policy possible.
+Keep CSS and JS in their colocated `.css` and `.js` files rather than inline
+`<style>` blocks, `style=""` attributes or inline `<script>` tags, and serve
+layout, feature and page assets from their folders (through the app, or copied
+by a build step). Separate files make asset ownership checkable in the build
+and keep a strict Content-Security-Policy possible. Give every file in a
+folder the same casing — either `snake_case` (`show_board/show_board.css`,
+`board/board.js`, `layout.css`) or `PascalCase` (`ShowBoard/ShowBoard.css`,
+`Board/Board.js`, `Layout.css`) — so the renderer can find a feature's or
+page's assets directly from its folder name.
 
 The cost is honest: a screen is now two places, its page folder and the
 features it shows. In exchange, each part of the screen is found by asking
@@ -191,7 +216,7 @@ AI agent has to rediscover the route between them.
 In FIDES the same work lives in:
 
 ```
-features/enroll/          # the use case, its view, its CSS
+features/enroll/          # the use case, its view, its CSS and JS
 entities/course/          # the rules, values, messages, settings, contract
 integrations/database/    # one store file
 delivery/wiring           # one line that connects them
@@ -208,7 +233,7 @@ without touching a rule.
 that feature names, at most one integration, and wiring. If it needs more, a
 concept is spread too far.
 
-### Depth and size
+### Depth, size and naming
 
 Spread has a vertical side too:
 
@@ -220,6 +245,16 @@ Spread has a vertical side too:
   reads down the page instead of across it.
 - **Split by concept, never by kind of code.** A folder of "helpers" or
   "utils" is a sign a concept has no owner yet.
+- **Consistent casing: `snake_case` or `PascalCase`.** Folder and file names
+  stay flexible to match the language, but pick one of the two standard styles
+  and use it everywhere in `src/` and `config/` — across zone folders,
+  entities, features, pages, view templates, `.css` and `.js`. Bias toward
+  `snake_case` in module-based languages (Python, Rust, Go, and the diagrams
+  in these docs: `entities/course/course_store`, `features/enroll/enroll.css`)
+  and toward `PascalCase` where namespaces and classes map 1:1 to folders and
+  files on disk (PHP PSR-4, C#: `Entities/Technician/TechnicianStore.php`,
+  `Features/Enroll/Enroll.css`). Never mix casings inside a project, and check
+  the choice in the build.
 
 ## Glossary
 
@@ -233,7 +268,7 @@ Spread has a vertical side too:
 | Message | A record of something that happened, saved with the change that caused it |
 | Feature | One use case, in one folder |
 | Feature view | A template in a feature's folder that displays that feature's values |
-| Page | One screen of a web delivery, in its own folder in delivery: page code plus a page template |
+| Page | One screen of a web delivery, in its own folder in delivery: page code, a page template, and any page-specific CSS and JS |
 | Page template | The template that lays out a page and places feature views on it |
 | Slot | Ready-made HTML a page hands into a feature view, such as another feature's form |
 | Read row | A small typed, read-only record a store returns for lists and screens |

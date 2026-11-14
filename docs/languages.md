@@ -12,6 +12,12 @@ rely on review and the build check.
 | Value | Something that checks itself when created and never changes |
 | No inheritance | A way to share behavior by composing, not extending |
 
+Folder and file casing follows the language, kept consistent across code,
+views, `.css`, `.js` and `config/` files: bias toward `snake_case` in
+module-based languages (Python, Rust, Go, and the language-neutral diagrams in
+these docs) and toward `PascalCase` where namespaces and classes map 1:1 to
+directories and files on disk (PHP with PSR-4, C#).
+
 ## PHP
 
 - **Unit:** a `final class` with `private` properties.
@@ -34,6 +40,15 @@ rely on review and the build check.
   existed.
 - **Config:** PHP has no built-in YAML parser. Use JSON, PHP arrays, or a
   small reader for the subset of YAML you allow.
+- **Naming:** PSR-4 maps namespaces and class names 1:1 to directories and
+  files (`Entities/Technician/TechnicianStore.php`,
+  `Features/ShowBoard/ShowBoard.php`). Keep `PascalCase` consistent across
+  folders, classes, view templates, `.css`, `.js` and `config/` files
+  (`ShowBoardView.php`, `ShowBoard.css`, `ShowBoard.js`, `Layout.css`,
+  `Layout.js`) so the renderer and build check match every colocated file by
+  folder name without mixing cases.
+
+See [the PHP example app](../examples/todo-php).
 
 ## Python
 

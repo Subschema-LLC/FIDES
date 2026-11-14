@@ -16,23 +16,32 @@ version before and after each step.
 - **New rule 14, pages compose features.** One folder per page in delivery. A
   page template places feature views. A feature's view never renders another
   feature's view. A form belongs to the feature that handles it, and the page
-  hands one feature's form into another feature's area as a slot. A feature's
-  CSS and scripts load when its view renders.
+  hands one feature's form into another feature's area as a slot. CSS and JS
+  follow three owners: global frame assets with the layout, feature-specific
+  assets in the feature folder, and page-specific assets in the page folder,
+  loaded in that order when views render.
 - Rules 14 to 17 are now 15 to 18.
 - **Rule 16, small and shallow,** allows one extra level for pages:
   `delivery/web/<page>/file`.
+- **Rule 17, rules are required, tools are examples,** recommends picking
+  either `snake_case` (module-based languages) or `PascalCase` (where
+  namespaces and classes map 1:1 to folders and files) and keeping that single
+  casing consistent across folders, code, views, `.css`, `.js` and `config/`.
 - **Rule 18, enforce mechanically,** now includes the language's type checker.
 
 ### Docs
 
-- `structure.md`: a Pages section (folders, slots, one-button actions, asset
-  order, page CSS), typed read rows beside the store contract, one way to talk
+- `structure.md`: a Pages section (folders, slots, one-button actions, three
+  levels of CSS and JS across layout, features and page folders, and render
+  order), `snake_case` vs. `PascalCase` consistency across folders and
+  colocated files, typed read rows beside the store contract, one way to talk
   to each system per integration, new glossary terms.
 - `migrating.md` (new): moving an existing app and proving nothing changed.
 - `ai.md`: page rules and "comments say what is true now" in the AGENTS.md
   template; add the checks on day one; prompting tips.
-- `languages.md`: what plain PHP templates need, and a type checker for PHP,
-  Python and TypeScript.
+- `languages.md`: `snake_case` and `PascalCase` naming guidance (including
+  PSR-4 `PascalCase` in PHP), what plain PHP templates need, and a type
+  checker for PHP, Python and TypeScript.
 - `why.md`: the cost that a screen is now two places.
 
 ### Example

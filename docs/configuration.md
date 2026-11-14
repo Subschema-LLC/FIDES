@@ -24,13 +24,14 @@ entities/course/course_settings
 Ownerless settings (an app title, a sender address) are declared in
 `shared/`.
 
-**Overrides live outside the source tree,** one file per owner, named exactly
-after it, holding only what differs:
+**Overrides live outside the source tree,** one file per owner, named after it
+in the same casing as `src/` (`snake_case` or `PascalCase`), holding only what
+differs:
 
 ```
 config/
-  app            # overrides the ownerless app settings
-  Course         # overrides CourseSettings
+  app            # overrides the ownerless app settings (or App in PascalCase)
+  course         # overrides course_settings (or Course in PascalCase)
 ```
 
 Why outside `src/`: live configuration belongs to whoever runs the app, and a
