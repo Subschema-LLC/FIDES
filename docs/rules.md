@@ -29,9 +29,9 @@ to other entities by identity (an id or a key), never by holding them.
 ## Features
 
 **4. One use case per feature folder,** named as an action and readable top to
-bottom. Its views, CSS and scripts sit beside it, including any form whose
-submission it handles. Rules that involve two entities live here, because
-neither entity owns them.
+bottom. Its views and feature-specific CSS and JS sit beside it, including any
+form whose submission it handles. Rules that involve two entities live here,
+because neither entity owns them.
 *Why: one concept, one place.*
 
 **5. Features never call each other.** When one thing should follow another,
@@ -108,13 +108,17 @@ the rule in the build. **(checkable)**
 *Why: a view that can only display cannot hide a rule or a security hole, and
 a mistake in shaping is caught where it is made, not on a page nobody opened.*
 
-**14. Pages compose features.** A page lives in delivery, one folder per page:
-the code that reads the request and calls features, and a page template that
-lays out the page and places feature views. A feature's view never renders
-another feature's view or a page template. A form belongs to the feature that
-handles its submission. When one feature's area holds another feature's form,
-the page renders that form and hands it in, ready-made, for the view to print
-in place. A feature's CSS and scripts load when one of its views renders.
+**14. Pages compose features.** A page lives in delivery, one folder per page
+(`delivery/web/<page>/`): the code that reads the request and calls features,
+a page template that lays out the page and places feature views, and any
+page-specific CSS and JS. A feature's view never renders another feature's
+view or a page template. A form belongs to the feature that handles its
+submission. When one feature's area holds another feature's form, the page
+renders that form and hands it in, ready-made, for the view to print in place.
+CSS and JS follow the same three owners: global frame assets sit with the
+layout, feature-specific assets sit in the feature folder, and page-specific
+assets sit in the page folder, loaded in that order (layout, then rendered
+features, then page) from `.css` and `.js` files rather than inline.
 **(checkable)**
 *Why: every part of a screen has one owner, and the page template reads as a
 list of what is on the page.*
@@ -139,8 +143,12 @@ kind of code. **(checkable)**
 
 **17. Rules are required, tools are examples.** FIDES names what must be true,
 never which framework, database or template engine to use. Follow your
-language's own conventions for naming and syntax.
-*Why: the rules outlive the tools.*
+language's own conventions for naming and syntax — typically `snake_case` in
+module-based languages or `PascalCase` where namespaces and classes map 1:1 to
+folders and files — and keep that single casing consistent across folders,
+code, views, `.css`, `.js` and `config/` files. **(checkable)**
+*Why: the rules outlive the tools, and consistent naming within a project lets
+people, renderers and AI agents predict every file path.*
 
 **18. Enforce mechanically.** The rules marked checkable run as a check in the
 build, and so does the language's type checker or static analyser, at a

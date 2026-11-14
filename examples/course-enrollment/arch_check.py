@@ -13,7 +13,7 @@ Run it in the build so a person or an AI agent cannot quietly break a rule.
   Spread       at most zone/owner/file deep (delivery: delivery/door/page/file),
                100-character lines, 200-line files
   Pages        each folder in delivery/web/ is one page: <page>.py, plus files named
-               <page>.html, <page>.css or <page>_<part>.<ext>
+               <page>.html, <page>.css, <page>.js or <page>_<part>.<ext>
 
 Two presentation rules need no check here because string.Template cannot break
 them: a template cannot name an entity, and a feature's view cannot render
@@ -37,7 +37,7 @@ MAX_LINE, MAX_LINES, MAX_DEPTH = 100, 200, 3
 def check(src: Path) -> list[str]:
     problems = []
     for path in sorted(src.rglob("*")):
-        if path.is_file() and path.suffix in (".py", ".html", ".css"):
+        if path.is_file() and path.suffix in (".py", ".html", ".css", ".js"):
             problems += check_spread(src, path)
             if path.suffix == ".py":
                 problems += check_python(src, path)

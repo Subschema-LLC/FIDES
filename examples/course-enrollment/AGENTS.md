@@ -12,7 +12,7 @@ checks most of it and fails the build when a rule is broken. Install mypy
 | A rule that is always true for a concept | that concept's folder in `src/entities/` |
 | Something a user or system does | a new folder in `src/features/` |
 | A new way the outside world reaches the app | `src/delivery/` |
-| A new web page | `src/delivery/web/<page>/`: `<page>.py` and `<page>.html` |
+| A new web page | `src/delivery/web/<page>/`: `<page>.py`, `<page>.html`, and any page-specific `.css` or `.js` |
 | A new way the app reaches the outside world | `src/integrations/`, behind a contract |
 | A contract no single entity owns | `src/shared/` |
 | A setting | declared with its default in the owner's settings class |
@@ -53,8 +53,11 @@ integration, stop and ask whether a concept is being spread too far.
     they are `Markup`. A feature shapes plain values for its own views.
 11. **Pages compose features.** A page is a folder in `src/delivery/web/`:
     `<page>.py` reads the request and calls features, `<page>.html` places
-    their views. A form belongs to the feature that handles it. A feature's
-    CSS loads when its view renders, so never list stylesheets by hand.
+    their views, and any page-specific `.css` and `.js` sit beside them. A form
+    belongs to the feature that handles it. CSS and JS are global in layout,
+    feature-specific in `src/features/<feature>/`, and page-specific in the
+    page folder; feature assets load when a feature view renders, so never list
+    them by hand.
 12. **Keep it close and small.** At most `zone/owner/file` deep (pages:
     `delivery/web/<page>/file`), lines up to 100 characters, files up to 200
     lines. Split by concept, never by kind of code.

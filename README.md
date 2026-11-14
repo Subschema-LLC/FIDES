@@ -24,7 +24,8 @@ one place, and enforces a short list of rules with an automated check.
 ## The idea in one minute
 
 - **One concept, one place.** A use case lives in one folder: its logic, its
-  views, its CSS. A page in delivery places those views; it does not own them.
+  views, its CSS and JS. A page in delivery places those views; it does not
+  own them.
 - **One owner.** Every piece of data has exactly one owner, and only the owner
   changes it.
 - **Dependencies point inward,** toward the rules that are true everywhere.
@@ -65,22 +66,25 @@ src/
     course/          # Course, its values, messages, settings, store contract
     student/
   features/
-    enroll/          # the use case, its view, its CSS
+    enroll/          # the use case, its view, its feature-specific CSS and JS
     transfer/
   integrations/
     database/        # fulfills the store contracts
     email/
   delivery/
-    web/             # layout, routes, and one folder per page
-      courses/       # page code + the template that places feature views
+    web/             # layout (with global CSS and JS), routes, and one folder per page
+      courses/       # page code, page template, and page-specific CSS and JS
     cli/  worker/
     wiring           # the only file that knows integrations exist
 ```
 
 Dependencies point one way. Delivery uses features, features use entities,
 integrations fulfill the contracts entities and shared declare, and only
-wiring sees integrations. Folder and file names follow your language's
-conventions.
+wiring sees integrations. Folder and file names stay flexible to match your
+language — bias toward `snake_case` in module-based languages (as shown above)
+or `PascalCase` where namespaces and classes map 1:1 to folders and files (as
+in PSR-4 PHP and C#) — and keep that choice consistent across folders, code,
+views, `.css`, `.js` and `config/`.
 
 ## Where FIDES fits
 

@@ -52,6 +52,7 @@ This app follows FIDES. Run `<check command>` before you finish.
 - Something a user or system does       -> a new folder in src/features/
 - A new way the world reaches the app   -> src/delivery/
 - A new web page                        -> src/delivery/web/<page>/
+- CSS or JS for a feature, page, frame  -> the feature folder, page folder, or layout
 - A new way the app reaches the world   -> src/integrations/, behind a contract
 - A contract no single entity owns      -> src/shared/
 - A setting                             -> declared in the owner's settings
@@ -68,10 +69,13 @@ This app follows FIDES. Run `<check command>` before you finish.
 8. One write by default. UnitOfWork only when two entities change.
 9. Settings: declared in code, overridden in config/, then env. Secrets: env only.
 10. Views only display. Escaped by default. Features shape their values.
-11. Pages compose features: a folder per page in delivery/web/. A form belongs
-    to the feature that handles it. A feature view never renders another's.
+11. Pages compose features: a folder per page in delivery/web/<page>/. A form
+    belongs to the feature that handles it. A feature view never renders
+    another's. CSS and JS are feature-specific in features/, global in layout,
+    and page-specific in the page folder (never inline).
 12. At most zone/owner/file deep (pages: delivery/web/<page>/file).
-    Small files, short lines.
+    Small files, short lines. Keep one casing (snake_case or PascalCase)
+    consistent across folders, code, views, .css, .js and config/.
 13. Comments say what is true now. History goes in the commit message.
 
 If a change touches more than its feature folder, the entities it names,

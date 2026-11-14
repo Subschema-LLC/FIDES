@@ -68,10 +68,10 @@ FIDES is not free. Know the costs before adopting it:
 - **Some repetition.** Because entities never import each other, two entities
   may each declare a small thing (such as a message contract) that a layered
   app would share.
-- **A screen is two places.** A page's folder in delivery lays it out, and
-  each feature it shows keeps its own view and CSS. Finding a button means
-  asking which feature handles it. In exchange, nothing on a page is owned
-  twice.
+- **A screen is two places.** A page's folder in delivery lays it out with any
+  page-specific CSS and JS, and each feature it shows keeps its own view, CSS
+  and JS. Finding a button means asking which feature handles it. In exchange,
+  nothing on a page is owned twice.
 - **A checker to maintain.** The rules only hold if the build enforces them.
 - **New habits.** The outbox and "one write by default" take a little getting
   used to if you are used to sending email from a controller.
