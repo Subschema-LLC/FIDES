@@ -1,0 +1,6 @@
+# Overrides for the TodoItem entity. The defaults live in the
+# entity's Settings class (src/entities/TodoItem/TodoItemSettings.php);
+# this file overrides only what it names, and an undeclared key
+# fails startup. The environment wins over this file
+# (TODOITEM_LIST_LIMIT).
+list_limit: 25
