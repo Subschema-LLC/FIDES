@@ -1,0 +1,24 @@
+.todo-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1rem;
+}
+
+.todo-page-header h1 {
+    margin: 0 0 0.25rem;
+}
+
+.todo-page-subtitle {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.925rem;
+}
+
+.todo-shortcut-hint kbd {
+    padding: 0.1rem 0.35rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.25rem;
+    background: #f9fafb;
+    font-size: 0.8rem;
+}

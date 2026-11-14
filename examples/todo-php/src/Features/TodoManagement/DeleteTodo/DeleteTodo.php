@@ -1,5 +1,5 @@
 <?php
-namespace App\Features\DeleteTodo;
+namespace App\Features\TodoManagement\DeleteTodo;
 
 use App\Entities\TodoItem\TodoItemStore;
 

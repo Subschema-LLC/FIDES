@@ -1,5 +1,5 @@
 <?php
-namespace App\Features\ReopenTodo;
+namespace App\Features\TodoManagement\ReopenTodo;
 
 use App\Entities\TodoItem\TodoItemStore;
 

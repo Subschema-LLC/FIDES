@@ -1,5 +1,5 @@
 <?php
-namespace App\Features\CompleteTodo;
+namespace App\Features\TodoManagement\CompleteTodo;
 
 use App\Entities\TodoItem\TodoItemStore;
 use App\Shared\Clock;

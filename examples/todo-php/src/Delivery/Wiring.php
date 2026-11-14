@@ -4,11 +4,11 @@
  *  finished features. Nothing else in the app names an integration. */
 
 use App\Entities\TodoItem\TodoItemSettings;
-use App\Features\AddTodo\AddTodo;
-use App\Features\CompleteTodo\CompleteTodo;
-use App\Features\DeleteTodo\DeleteTodo;
-use App\Features\ListTodos\ListTodos;
-use App\Features\ReopenTodo\ReopenTodo;
+use App\Features\TodoManagement\AddTodo\AddTodo;
+use App\Features\TodoManagement\CompleteTodo\CompleteTodo;
+use App\Features\TodoManagement\DeleteTodo\DeleteTodo;
+use App\Features\TodoManagement\ListTodos\ListTodos;
+use App\Features\TodoManagement\ReopenTodo\ReopenTodo;
 use App\Integrations\Clock\SystemClock;
 use App\Integrations\Config\ConfigLoader;
 use App\Integrations\Database\SqliteTodoItemStore;
