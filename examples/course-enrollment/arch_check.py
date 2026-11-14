@@ -10,7 +10,15 @@ Run it in the build so a person or an AI agent cannot quietly break a rule.
                delivery      -> features, shared, delivery (wiring.py may import anything)
   Core is pure entities, features and shared never import I/O modules or read the clock
   No inheritance  classes may only subclass Protocol (a contract)
-  Spread       at most zone/owner/file deep, 100-character lines, 200-line files
+  Spread       at most zone/owner/file deep (delivery: delivery/door/page/file),
+               100-character lines, 200-line files
+  Pages        each folder in delivery/web/ is one page: <page>.py, plus files named
+               <page>.html, <page>.css or <page>_<part>.<ext>
+
+Two presentation rules need no check here because string.Template cannot break
+them: a template cannot name an entity, and a feature's view cannot render
+another feature's view or a page template. Check them if your templates can
+run code.
 """
 
 import ast
@@ -33,20 +41,37 @@ def check(src: Path) -> list[str]:
             problems += check_spread(src, path)
             if path.suffix == ".py":
                 problems += check_python(src, path)
-    return problems
+    return problems + check_pages(src / "delivery" / "web")
 
 
 def check_spread(src: Path, path: Path) -> list[str]:
     rel = path.relative_to(src)
     problems = []
-    if len(rel.parts) > MAX_DEPTH:
-        problems.append(f"{rel}: deeper than zone/owner/file")
+    depth = MAX_DEPTH + 1 if rel.parts[0] == "delivery" else MAX_DEPTH
+    if len(rel.parts) > depth:
+        shape = "delivery/door/page/file" if rel.parts[0] == "delivery" else "zone/owner/file"
+        problems.append(f"{rel}: deeper than {shape}")
     lines = path.read_text(encoding="utf-8").splitlines()
     if len(lines) > MAX_LINES:
         problems.append(f"{rel}: {len(lines)} lines (max {MAX_LINES}); a concept is hiding in it")
     for number, line in enumerate(lines, start=1):
         if len(line) > MAX_LINE:
             problems.append(f"{rel}:{number}: {len(line)} characters (max {MAX_LINE})")
+    return problems
+
+
+def check_pages(web: Path) -> list[str]:
+    if not web.is_dir():
+        return []
+    problems = []
+    for folder in sorted(p for p in web.iterdir() if p.is_dir() and p.name != "__pycache__"):
+        page = folder.name
+        files = [p.name for p in folder.iterdir() if p.is_file()]
+        if f"{page}.py" not in files:
+            problems.append(f"delivery/web/{page}: a page folder needs {page}.py")
+        for name in sorted(files):
+            if name.split(".")[0] != page and not name.startswith(f"{page}_"):
+                problems.append(f"delivery/web/{page}/{name}: page files are named for the page")
     return problems
 
 
@@ -62,7 +87,8 @@ def check_python(src: Path, path: Path) -> list[str]:
         for module in imported_modules(node):
             reason = import_problem(zone, owner, rel, module)
             if reason:
-                problems.append(f"{rel}:{node.lineno}: imports {module}, but {reason}")
+                line = getattr(node, "lineno", 0)
+                problems.append(f"{rel}:{line}: imports {module}, but {reason}")
         if isinstance(node, ast.ClassDef) and not all(is_protocol(b) for b in node.bases):
             problems.append(f"{rel}:{node.lineno}: {node.name} inherits; compose instead")
         if zone in CORE and isinstance(node, ast.Call) and reads_clock(node):
@@ -122,4 +148,4 @@ if __name__ == "__main__":
     if found:
         print("arch_check FAILED:\n  " + "\n  ".join(found), file=sys.stderr)
         raise SystemExit(1)
-    print("arch_check OK: imports, purity, no inheritance, spread")
+    print("arch_check OK: imports, purity, no inheritance, spread, pages")

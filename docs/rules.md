@@ -1,8 +1,9 @@
 # The rules
 
 These are all of FIDES's rules. Each comes with the reason for it. Rules
-marked **(checkable)** can be enforced by a script in the build; the example's
-`arch_check.py` checks all of them.
+marked **(checkable)** have a part that a script in the build can check. The
+example's `arch_check.py` checks each of them, or says why its template
+language already makes breaking the rule impossible.
 
 **The test behind every rule:** a new developer or an AI agent understands any
 feature in five minutes, and you can come back after six months and find your
@@ -28,8 +29,9 @@ to other entities by identity (an id or a key), never by holding them.
 ## Features
 
 **4. One use case per feature folder,** named as an action and readable top to
-bottom. Its view, CSS and scripts sit beside it. Rules that involve two
-entities live here, because neither entity owns them.
+bottom. Its views, CSS and scripts sit beside it, including any form whose
+submission it handles. Rules that involve two entities live here, because
+neither entity owns them.
 *Why: one concept, one place.*
 
 **5. Features never call each other.** When one thing should follow another,
@@ -97,33 +99,53 @@ Details: [configuration.md](configuration.md).
 ## Presentation
 
 **13. Views only display.** A view gets plain values shaped by its feature,
-never fetches data and holds no business rules. Output is escaped by default,
-and unescaped output is explicit and rare. Pages are composed in delivery,
-never by one feature's view pulling in another's. Prefer a logic-less
-template language (Mustache-style) so the template cannot break this rule.
-*Why: a view that can only display cannot hide a rule or a security hole.*
+never fetches data and holds no business rules. The shaping happens in the
+feature's code, where tests and the type checker can see it, and a template
+never names an entity. Output is escaped by default, and unescaped output is
+explicit and rare. Prefer a logic-less template language (Mustache-style) so
+the template cannot break this rule. If your templates can run code, check
+the rule in the build. **(checkable)**
+*Why: a view that can only display cannot hide a rule or a security hole, and
+a mistake in shaping is caught where it is made, not on a page nobody opened.*
+
+**14. Pages compose features.** A page lives in delivery, one folder per page:
+the code that reads the request and calls features, and a page template that
+lays out the page and places feature views. A feature's view never renders
+another feature's view or a page template. A form belongs to the feature that
+handles its submission. When one feature's area holds another feature's form,
+the page renders that form and hands it in, ready-made, for the view to print
+in place. A feature's CSS and scripts load when one of its views renders.
+**(checkable)**
+*Why: every part of a screen has one owner, and the page template reads as a
+list of what is on the page.*
+
+Details: [structure.md](structure.md#pages).
 
 ## Size and spread
 
-**14. One concept, one place.** A change touches its feature folder, the
+**15. One concept, one place.** A change touches its feature folder, the
 entities that feature names, at most one integration, and wiring. If it needs
 more, a concept is spread too far.
 *Why: the cost of a change is mostly the cost of finding everything it
 touches.*
 
-**15. Small and shallow.** Never deeper than `zone/owner/file`. Files stay
-under about 200 lines, lines under about 100 characters. Split by concept,
-never by kind of code. **(checkable)**
+**16. Small and shallow.** Never deeper than `zone/owner/file`. The one extra
+level is a page in delivery: `delivery/web/<page>/file`. Files stay under
+about 200 lines, lines under about 100 characters. Split by concept, never by
+kind of code. **(checkable)**
 *Why: code you can see whole is code you can understand whole.*
 
 ## Practice
 
-**16. Rules are required, tools are examples.** FIDES names what must be true,
+**17. Rules are required, tools are examples.** FIDES names what must be true,
 never which framework, database or template engine to use. Follow your
 language's own conventions for naming and syntax.
 *Why: the rules outlive the tools.*
 
-**17. Enforce mechanically.** The import rules run as a check in the build, and
-an `AGENTS.md` states the rules on one page.
+**18. Enforce mechanically.** The rules marked checkable run as a check in the
+build, and so does the language's type checker or static analyser, at a
+strict setting. An `AGENTS.md` states the rules on one page.
 *Why: a written rule is a request. A failing build is the part nobody, human
-or AI, can quietly skip.*
+or AI, can quietly skip. A rule the build does not check drifts: in a
+production app moved onto FIDES, the size limits were written down but not
+checked, and they were not kept.*

@@ -18,11 +18,20 @@ rely on review and the build check.
 - **Contract:** an `interface`. Implementations use `implements`, never `extends`.
 - **Value:** a `final readonly class` that validates in its constructor.
 - **Enforcement:** Deptrac, or a short script that reads `use` statements and
-  fails on any `extends`.
-- **Views:** plain PHP templates require escaping every value by hand, and one
-  missed call is a security hole. Prefer a logic-less engine (Mustache) or an
-  auto-escaping one (Twig, Blade). Twig and Blade allow logic, so keep it out
-  by review.
+  fails on any `extends`. Run PHPStan or Psalm in the same build, level 5 or
+  higher.
+- **Views:** Mustache is logic-less. Twig and Blade escape by default but
+  allow logic, so keep it out by review. Plain PHP templates need no
+  dependency and every PHP developer reads them, but they can run any code
+  and every value must be escaped by hand, so one missed call is a security
+  hole. If you choose them, keep them close to logic-less: a short escape
+  helper on every value, loops and conditions only over values the feature
+  already shaped, and a check in the build that fails when a template names an
+  entity or renders another feature's view. Give each template's values a
+  `@var` type so the static analyser reads them; an untyped value is a blind
+  spot. A production app moved onto FIDES used plain PHP templates, and its
+  one rendering regression was a template reading a field that no longer
+  existed.
 - **Config:** PHP has no built-in YAML parser. Use JSON, PHP arrays, or a
   small reader for the subset of YAML you allow.
 
@@ -35,7 +44,7 @@ rely on review and the build check.
   inherit from it, which keeps the no-inheritance rule absolute.
 - **Value:** `@dataclass(frozen=True)` that checks itself in `__post_init__`.
 - **Enforcement:** import-linter, or a short `ast` script (the example's
-  `arch_check.py` is about 125 lines).
+  `arch_check.py` is about 150 lines). Add mypy or pyright in strict mode.
 - **Views:** `string.Template` is logic-less and in the standard library.
 - **Web:** a plain WSGI function avoids subclassing a framework's handler.
 
@@ -48,7 +57,8 @@ See [the example app](../examples/course-enrollment).
 - **Contract:** an `interface`. TypeScript matches by shape, so implementations
   need no `extends` and no `implements`, though `implements` documents intent.
 - **Value:** a class with `readonly` fields, frozen with `Object.freeze`.
-- **Enforcement:** dependency-cruiser or eslint-plugin-boundaries.
+- **Enforcement:** dependency-cruiser or eslint-plugin-boundaries, plus
+  `tsc --strict`.
 - **Note:** FIDES fits the Node backend. For the browser app itself, see
   [why.md](why.md#where-it-fits).
 

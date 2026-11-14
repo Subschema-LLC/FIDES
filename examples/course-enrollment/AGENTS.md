@@ -2,7 +2,8 @@
 
 This app follows FIDES. The full spec is in the repository root under `docs/`.
 This page is the part you need while changing code. `python3 run_tests.py`
-checks most of it and fails the build when a rule is broken.
+checks most of it and fails the build when a rule is broken. Install mypy
+(`pip install mypy`) so it type-checks `src/` too.
 
 ## Where code goes
 
@@ -11,6 +12,7 @@ checks most of it and fails the build when a rule is broken.
 | A rule that is always true for a concept | that concept's folder in `src/entities/` |
 | Something a user or system does | a new folder in `src/features/` |
 | A new way the outside world reaches the app | `src/delivery/` |
+| A new web page | `src/delivery/web/<page>/`: `<page>.py` and `<page>.html` |
 | A new way the app reaches the outside world | `src/integrations/`, behind a contract |
 | A contract no single entity owns | `src/shared/` |
 | A setting | declared with its default in the owner's settings class |
@@ -48,14 +50,21 @@ integration, stop and ask whether a concept is being spread too far.
    startup. Secrets come from the environment only. The database holds
    transactional data, never configuration.
 10. **Views only display.** Templates have no logic. Values are escaped unless
-    they are `Markup`. Pages are composed in delivery.
-11. **Keep it close and small.** At most `zone/owner/file` deep, lines up to 100
-    characters, files up to 200 lines. Split by concept, never by kind of code.
+    they are `Markup`. A feature shapes plain values for its own views.
+11. **Pages compose features.** A page is a folder in `src/delivery/web/`:
+    `<page>.py` reads the request and calls features, `<page>.html` places
+    their views. A form belongs to the feature that handles it. A feature's
+    CSS loads when its view renders, so never list stylesheets by hand.
+12. **Keep it close and small.** At most `zone/owner/file` deep (pages:
+    `delivery/web/<page>/file`), lines up to 100 characters, files up to 200
+    lines. Split by concept, never by kind of code.
+13. **Comments say what is true now.** What changed and why goes in the commit
+    message, not in the code.
 
 ## Before you finish
 
 ```bash
-python3 run_tests.py      # architecture check + all tests
+python3 run_tests.py      # architecture check, type check (with mypy), all tests
 ```
 
 Coming back after months away? Read this page, then `config/`, then
