@@ -24,11 +24,18 @@ goes and what to run before finishing. Agents read it first; people coming
 back after months away should too. Keep it short: if it does not fit on a
 page, it will not be followed.
 
-**2. A check in the build.** The import rules, purity, no inheritance and the
-size limits, enforced by a script or tool that fails the build. A written
-rule is a request. A failing build is the part nobody can quietly skip. Six
-months from now, an agent will "helpfully" import a database class into a
-feature to save a step. The check is what stops it.
+**2. A check in the build.** The import rules, purity, no inheritance, the
+size limits and the page rules, enforced by a script or tool that fails the
+build, plus the language's type checker at a strict setting. A written rule
+is a request. A failing build is the part nobody can quietly skip. Six months
+from now, an agent will "helpfully" import a database class into a feature to
+save a step. The check is what stops it.
+
+Add both on day one. In a production app moved onto FIDES, the first run of
+a static analyser found a flash message printing an undefined variable and a
+redirect that could never run. The size limits there were written down but
+never checked, and by the time anyone measured, about 2,000 lines ran past
+100 characters.
 
 ## AGENTS.md template
 
@@ -44,6 +51,7 @@ This app follows FIDES. Run `<check command>` before you finish.
 - A rule always true for a concept      -> its folder in src/entities/
 - Something a user or system does       -> a new folder in src/features/
 - A new way the world reaches the app   -> src/delivery/
+- A new web page                        -> src/delivery/web/<page>/
 - A new way the app reaches the world   -> src/integrations/, behind a contract
 - A contract no single entity owns      -> src/shared/
 - A setting                             -> declared in the owner's settings
@@ -59,8 +67,12 @@ This app follows FIDES. Run `<check command>` before you finish.
 7. Messages: entities record, stores save with the change, a worker dispatches.
 8. One write by default. UnitOfWork only when two entities change.
 9. Settings: declared in code, overridden in config/, then env. Secrets: env only.
-10. Views only display. Escaped by default. Composed in delivery.
-11. At most zone/owner/file deep. Small files, short lines.
+10. Views only display. Escaped by default. Features shape their values.
+11. Pages compose features: a folder per page in delivery/web/. A form belongs
+    to the feature that handles it. A feature view never renders another's.
+12. At most zone/owner/file deep (pages: delivery/web/<page>/file).
+    Small files, short lines.
+13. Comments say what is true now. History goes in the commit message.
 
 If a change touches more than its feature folder, the entities it names,
 one integration and wiring, stop and ask whether something is spread too far.
@@ -82,3 +94,9 @@ one integration and wiring, stop and ask whether something is spread too far.
   finish."
 - When an agent wants to add a new zone, layer or "helpers" folder, treat it
   as a design question, not a code change.
+- Ask for comments that say what is true now. Agents tend to leave notes about
+  what they changed ("now uses X instead of Y", "moved from the old routes
+  file"). That is history. It belongs in the commit message, and in the code
+  it goes stale the day it is written.
+- When an agent restructures working code, ask it to prove nothing changed,
+  not to say so. [migrating.md](migrating.md) describes checks that do.

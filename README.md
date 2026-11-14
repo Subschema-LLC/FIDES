@@ -6,8 +6,8 @@ FIDES is a way to structure software so it stays simple, readable and
 encapsulated, for the people who write it and for the AI agents that help
 them. It works in any programming language.
 
-> **Status:** draft 0.1. The rules are being tested against real apps and
-> will change.
+> **Status:** draft 0.2. The rules are being tested against real apps and
+> will change. See [CHANGELOG.md](CHANGELOG.md) for what changed and why.
 
 ## The problem
 
@@ -24,7 +24,7 @@ one place, and enforces a short list of rules with an automated check.
 ## The idea in one minute
 
 - **One concept, one place.** A use case lives in one folder: its logic, its
-  view, its CSS.
+  views, its CSS. A page in delivery places those views; it does not own them.
 - **One owner.** Every piece of data has exactly one owner, and only the owner
   changes it.
 - **Dependencies point inward,** toward the rules that are true everywhere.
@@ -71,7 +71,9 @@ src/
     database/        # fulfills the store contracts
     email/
   delivery/
-    web/  cli/  worker/
+    web/             # layout, routes, and one folder per page
+      courses/       # page code + the template that places feature views
+    cli/  worker/
     wiring           # the only file that knows integrations exist
 ```
 
@@ -109,17 +111,19 @@ More in [docs/why.md](docs/why.md).
 6. [Working with AI](docs/ai.md): AGENTS.md, the build check, reading order
 7. [Language notes](docs/languages.md): FIDES in PHP, Python, TypeScript, Java,
    C#, Go and Rust
+8. [Moving an existing app](docs/migrating.md): change the structure and prove
+   nothing else changed
 
 ## Example
 
 [examples/course-enrollment](examples/course-enrollment) is a small Python app
 (standard library only) where students enroll in, drop and transfer between
-courses. It shows every rule in working code, with 31 tests and an
-architecture check.
+courses. It shows every rule in working code, with 34 tests, an architecture
+check, and a type check when mypy is installed.
 
 ```bash
 cd examples/course-enrollment
-python3 run_tests.py          # architecture check + tests
+python3 run_tests.py          # architecture check, type check, tests
 python3 app.py serve          # http://127.0.0.1:8080
 ```
 

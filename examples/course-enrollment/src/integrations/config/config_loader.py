@@ -82,7 +82,7 @@ def merge(base: dict[str, Any], over: dict[str, Any]) -> dict[str, Any]:
     return result
 
 
-def _default_of(settings_class: type, field: dataclasses.Field) -> Any:
+def _default_of(settings_class: type, field: dataclasses.Field[Any]) -> Any:
     if field.default is not dataclasses.MISSING:
         return field.default
     if field.default_factory is not dataclasses.MISSING:

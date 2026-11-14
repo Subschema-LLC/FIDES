@@ -2,7 +2,8 @@
 
 A small FIDES app: students enroll in courses, drop them and transfer between
 them. It uses only the Python standard library (3.11 or newer), so there is
-nothing to install.
+nothing to install. Install mypy if you want `run_tests.py` to type-check
+`src/` as well.
 
 It exists to show every FIDES rule working in real code. Being in Python, it
 also shows that the rules do not depend on any one language.
@@ -17,7 +18,7 @@ python3 app.py transfer 2 MATH120 ENG105  # two courses change in one UnitOfWork
 python3 app.py work                       # send confirmation emails (to var/mail.log)
 python3 app.py config Course              # each setting and where its value came from
 python3 app.py serve                      # web app on http://127.0.0.1:8080
-python3 run_tests.py                      # architecture check + 31 tests
+python3 run_tests.py                      # architecture check, type check, 34 tests
 ```
 
 Delete `var/app.sqlite` to start over with the demo data.
@@ -49,7 +50,8 @@ src/
     email/         # FileMailer (writes to var/mail.log)
     clock/         # SystemClock
   delivery/
-    web/           # WSGI routes, escape-by-default rendering, layout
+    web/           # WSGI routes, layout, escape-by-default rendering
+      courses/     #   one folder per page: courses.py (request) + courses.html (layout)
     cli/           # the same features from a terminal
     worker/        # dispatches saved messages after commit
     wiring.py      # the only file that knows integrations exist
@@ -82,7 +84,12 @@ FIDES rules are the same in every language. These are the Python choices:
 - **Privacy** is by convention (a leading underscore), because Python cannot
   enforce it. Rule 1 relies on review here, so it is written down plainly.
 - **Views** use `string.Template`, which cannot loop or branch. Lists are
-  rendered by repeating a row template in delivery.
+  rendered by repeating a row template in delivery. Because a template cannot
+  run code, it cannot name an entity or render another feature's view, so
+  those two rules need no check here.
+- **Pages** are folders in `delivery/web/`. The `Renderer` renders feature
+  views from their feature folders and remembers which features rendered, so
+  each feature's CSS reaches the page without anyone listing it.
 - **Config** is TOML because Python can read it with no dependencies. The
   format is a tool choice, not a FIDES rule.
 - **The web server** is a plain WSGI function, so no framework class has to

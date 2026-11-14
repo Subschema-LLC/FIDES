@@ -18,6 +18,10 @@ BAD_FILES = {
     "shared/clock.py": "import sqlite3\n",
     "delivery/web/app.py": "from integrations.email.file_mailer import FileMailer\n",
     "integrations/email/mailer.py": "x = '" + "a" * 120 + "'\n",
+    "delivery/web/roster/roster.py": "",
+    "delivery/web/roster/helpers.py": "",
+    "delivery/web/grades/grades.html": "",
+    "delivery/web/roster/parts/table.html": "",
 }
 
 
@@ -37,7 +41,10 @@ class ArchitectureTest(unittest.TestCase):
                          "Student inherits", "reads the clock",
                          "shared must not touch the outside world",
                          "delivery/web may not import from integrations",
-                         "characters (max 100)"):
+                         "characters (max 100)",
+                         "roster/helpers.py: page files are named for the page",
+                         "delivery/web/grades: a page folder needs grades.py",
+                         "deeper than delivery/door/page/file"):
             self.assertIn(expected, problems)
 
 
