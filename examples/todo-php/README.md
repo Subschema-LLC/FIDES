@@ -12,7 +12,8 @@ web pages that compose feature views with colocated CSS and JS, one
 store contract, declared settings with overrides, and an
 architecture check that fails the build when the shape breaks.
 The course-enrollment example shows the same rules at larger
-scale, in Python.
+scale, in Python, and the todo-symfony example runs this app's
+entities and features unchanged inside Symfony.
 
 ## Run it
 

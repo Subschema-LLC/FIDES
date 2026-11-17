@@ -8,7 +8,8 @@ still holds.
 
 This page covers what changes inside a framework: where its pieces go, the
 container, the `config/` folder, settings the framework compiles, ORMs,
-templates, base classes and traits, and moving in a piece at a time.
+templates, base classes and traits, and moving in a piece at a time. The
+[Symfony example](../examples/todo-symfony) shows them in working code.
 
 ## Where the framework's pieces go
 
@@ -118,8 +119,8 @@ other by id, so FIDES gives that graph up on purpose:
 - **The mapping stays in integrations.** Either map the entity itself with the
   ORM's external mapping (XML, PHP or fluent configuration) when its shape
   fits, or map a record class in integrations and let the store copy between
-  record and entity. Active-record ORMs always need the record form, because
-  the model inherits from the framework.
+  record and entity, as the Symfony example does. Active-record ORMs always
+  need the record form, because the model inherits from the framework.
 - **Reads across entities use a read model**
   ([structure.md](structure.md#read-models)), usually one SQL query or a
   database view, outside the ORM's object graph.
@@ -136,7 +137,9 @@ delivery:
 - **A page template may extend the layout.** Both live in delivery.
 - **A feature view is a fragment.** It extends nothing and includes only its
   own partials, never another feature's view or a page template. The page
-  template includes it (rule 14).
+  places it (rule 14): its template includes the view, or prints the HTML
+  the page code rendered from it, as the Symfony example does so it can load
+  each feature's CSS and JS in render order.
 - **Point the template loader at feature folders,** so a view stays beside its
   feature: a Twig namespace (`@Features/ListTodos/ListTodosView.html.twig`), a
   Blade view path, a Django template directory.

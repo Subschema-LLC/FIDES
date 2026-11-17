@@ -2,10 +2,10 @@
 namespace App\Entities\TodoItem;
 
 /** The settings TodoItem declares: every key, its default and its
- *  validation, in the entity's own folder. Overrides live in
- *  config/TodoItem.yaml and in the environment (TODOITEM_LIST_LIMIT);
- *  ConfigLoader merges them in that order and an undeclared key
- *  fails startup. */
+ *  validation, in the entity's own folder. Overrides live in the
+ *  operator's TodoItem.yaml and in the environment
+ *  (TODOITEM_LIST_LIMIT); the config loader merges them in that order
+ *  and an undeclared key fails startup. */
 final class TodoItemSettings
 {
     public function __construct(public readonly int $listLimit = 50)

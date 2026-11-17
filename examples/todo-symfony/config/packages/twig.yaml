@@ -1,0 +1,7 @@
+# Page templates and the layout live in src/Delivery/Web. Feature views
+# live beside their features and load as @Features/<Group>/<Feature>/...
+twig:
+    default_path: '%kernel.project_dir%/src/Delivery/Web'
+    paths:
+        '%kernel.project_dir%/src/Features': Features
+    strict_variables: true

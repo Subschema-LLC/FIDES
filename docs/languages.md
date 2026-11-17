@@ -72,7 +72,8 @@ directories and files on disk (PHP with PSR-4, C#).
   `Layout.js`) so the renderer and build check match every colocated file by
   folder name without mixing cases.
 
-See [the PHP example app](../examples/todo-php).
+See [the PHP example app](../examples/todo-php), and the same app inside
+Symfony with Doctrine and Twig ([todo-symfony](../examples/todo-symfony)).
 
 ## Python
 

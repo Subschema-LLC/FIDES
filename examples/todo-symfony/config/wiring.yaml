@@ -1,0 +1,23 @@
+# The wiring: the one file that names integrations and binds each contract
+# to the integration that fulfills it. Every contract is bound here even
+# where the container could guess. arch-check.php fails if a contract in
+# src/Entities or src/Shared is missing here, or if any file in src/ outside
+# src/Integrations names an integration.
+services:
+    _defaults:
+        autowire: true
+
+    App\Integrations\Clock\SystemClock: ~
+    App\Integrations\Database\DoctrineTodoItemStore: ~
+
+    # Built each time the container builds the app (every request under
+    # PHP-FPM), so settings are never compiled into Symfony's cache.
+    App\Integrations\Config\ConfigLoader:
+        factory: ['App\Integrations\Config\ConfigLoader', 'fromEnvironment']
+        arguments: ['%kernel.project_dir%/overrides']
+
+    App\Shared\Clock: '@App\Integrations\Clock\SystemClock'
+    App\Shared\SettingsSources: '@App\Integrations\Config\ConfigLoader'
+    App\Entities\TodoItem\TodoItemStore: '@App\Integrations\Database\DoctrineTodoItemStore'
+    App\Entities\TodoItem\TodoItemSettings:
+        factory: ['@App\Integrations\Config\ConfigLoader', 'todoItemSettings']

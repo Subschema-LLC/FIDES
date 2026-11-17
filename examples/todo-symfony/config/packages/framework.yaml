@@ -1,0 +1,19 @@
+# Symfony's own settings. They ship with the code; operator overrides for
+# the app's settings live in overrides/, read at startup by the config loader.
+framework:
+    secret: '%env(APP_SECRET)%'
+    http_method_override: false
+    session:
+        handler_id: null
+        save_path: '%kernel.project_dir%/var/sessions'
+        cookie_secure: auto
+        cookie_samesite: lax
+    php_errors:
+        log: true
+
+when@test:
+    framework:
+        test: true
+        session:
+            storage_factory_id: session.storage.factory.mock_file
+            save_path: ~

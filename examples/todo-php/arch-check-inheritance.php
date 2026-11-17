@@ -6,10 +6,15 @@
  *    because PHP only throws Throwables.
  *  - A trait used in a class, trait or enum body counts as inheritance. A
  *    closure's `use ($x)` sits inside a method, deeper than the body, and is
- *    not a trait. */
+ *    not a trait.
+ *  - $allowed names the parents and traits a framework requires of this one
+ *    file, listed in arch-check.php with the reason. */
 
-/** @return list<string> */
-function inheritanceProblems(string $code): array
+/**
+ * @param list<string> $allowed
+ * @return list<string>
+ */
+function inheritanceProblems(string $code, array $allowed = []): array
 {
     $skip = [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT];
     $tokens = array_values(array_filter(
@@ -38,12 +43,12 @@ function inheritanceProblems(string $code): array
             $depth--;
         } elseif ($id === T_EXTENDS) {
             foreach (namesAfter($tokens, $i) as $parent) {
-                if (!isBuiltInException($parent)) {
+                if (!isBuiltInException($parent) && !in_array($parent, $allowed, true)) {
                     $problems[] = "extends $parent (no inheritance)";
                 }
             }
         } elseif ($id === T_USE && end($bodies) === $depth) {
-            foreach (namesAfter($tokens, $i) as $trait) {
+            foreach (array_diff(namesAfter($tokens, $i), $allowed) as $trait) {
                 $problems[] = "uses trait $trait (traits count as inheritance)";
             }
         }

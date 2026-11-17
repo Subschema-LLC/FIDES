@@ -56,6 +56,16 @@ says how it fits inside one.
   also fails on traits. `arch-check.php` takes a folder to check, so a new
   test runs it on a throwaway tree of rule breaks.
 - `arch_check.py` has a `SIZE_EXEMPT` list, empty in this app, with a test.
+- **New example, `todo-symfony`:** the PHP to-do app inside Symfony 7.4 with
+  Doctrine ORM and Twig. Its entities, feature use cases and `Clock` are the
+  PHP example's byte for byte, and its tests check that. It shows wiring in
+  one container file (checked: every contract bound), Doctrine mapping on a
+  record class in integrations, Twig feature views as fragments under an
+  `@Features` namespace, plain controllers, invokable commands, the kernel
+  as the one listed edge exception, `overrides/` beside Symfony's `config/`,
+  and settings built per request. 19 tests plus the architecture check.
+- Three comments in the PHP example's core no longer name `.php` view files
+  or `config/`, so the same core reads true inside Symfony.
 - Test counts: 38 in the Python example (from 34), 23 plus the architecture
   check in the PHP example (its README said 21).
 
