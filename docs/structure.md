@@ -40,9 +40,45 @@ Some features react to messages instead of to people
 ### Shared
 
 Contracts that no single entity owns: `UnitOfWork`, `Clock`, `Mailer`,
-`MessageBus`, plus ownerless settings (`AppSettings`). Contracts and small
-values only, never logic, or it turns into a junk drawer. Shared imports
-nothing else from the app.
+`MessageBus`, plus ownerless settings (`AppSettings`) and read models.
+Contracts and small values only, never logic, or it turns into a junk drawer.
+Shared imports nothing else from the app.
+
+#### Read models
+
+Some screens need several entities at once: a roster of students per course,
+an invoice with its client, time entries and payments. No entity owns that
+view, and entities never hold each other, so the read gets a contract of its
+own, a **read model**, in a folder of its own in shared:
+
+```
+shared/class_roster/
+  class_roster        # the query contract and its typed, read-only rows
+integrations/database/
+  class_roster        # fulfills it with one query: a join or a database view
+features/list_roster/
+  list_roster         # asks the read model and shapes the rows for its view
+```
+
+- **Two entities or more.** A read model joins or aggregates across at least
+  two entities. A list of one entity is not a read model: that entity's store
+  returns read rows (see Entities).
+- **It only reads.** Every change still goes through the owning entity and its
+  store, so the rules stay in one place.
+- **Pure data.** The folder holds the query contract and its immutable rows,
+  nothing else: no sorting or filtering helpers, no formatting. Rows hold
+  plain values (text, numbers, dates, ids), never entities, so shared still
+  imports nothing else from the app.
+- **One query behind it.** The integration answers with a join or a database
+  view, never a loop that loads entities one by one.
+- **Features use it, delivery does not.** A feature asks the read model and
+  shapes the rows for its view, like any use case. Two features may use the
+  same read model: that is sharing a contract, not features calling each
+  other.
+
+This is the read side of CQRS without separate databases or events: writes go
+through entities, reads that span entities go through read models, and both
+use the same database.
 
 ### Integrations
 
@@ -243,7 +279,9 @@ Spread has a vertical side too:
 - **Shallow.** Never deeper than `zone/owner/file`. The one exception is a
   page in delivery: `delivery/web/<page>/file`.
 - **Small files.** A file past about 200 lines is hiding another concept.
-  Give that concept its own unit.
+  Give that concept its own unit, named for it. A data file (a lookup table,
+  generated code) may be listed in the checker as an exemption, with its
+  reason, never logic and never with a comment in the file itself.
 - **Short lines.** About 100 characters, one statement per line, so code
   reads down the page instead of across it.
 - **Split by concept, never by kind of code.** A folder of "helpers" or
@@ -275,5 +313,6 @@ Spread has a vertical side too:
 | Page template | The template that lays out a page and places feature views on it |
 | Slot | Ready-made HTML a page hands into a feature view, such as another feature's form |
 | Read row | A small typed, read-only record a store returns for lists and screens |
+| Read model | A read-only query contract in shared for data that spans two entities or more, with its typed rows, fulfilled by an integration |
 | Settings | An owner's tunable values, declared in code with defaults and rules |
 | Wiring | The one file that builds the app from its parts; with a dependency-injection container, the one file that binds every contract to its integration |

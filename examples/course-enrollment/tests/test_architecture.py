@@ -4,10 +4,12 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+import arch_check  # noqa: E402
 from arch_check import check  # noqa: E402
 
 BAD_FILES = {
@@ -57,6 +59,20 @@ class ArchitectureTest(unittest.TestCase):
             problems = "\n".join(check(src))
         self.assertNotIn("CourseFull inherits", problems)
         self.assertIn("WaitlistFull inherits", problems)
+
+
+    def test_a_listed_data_file_may_pass_the_size_limits(self) -> None:
+        table = "PATTERNS = [\n" + "    'bot',\n" * 250 + "]\n"
+        exempt = {"integrations/bots/patterns.py": "a lookup table, not logic"}
+        with tempfile.TemporaryDirectory() as folder:
+            src = Path(folder)
+            (src / "integrations/bots").mkdir(parents=True)
+            (src / "integrations/bots/patterns.py").write_text(table, encoding="utf-8")
+            (src / "integrations/bots/rules.py").write_text(table, encoding="utf-8")
+            with mock.patch.dict(arch_check.SIZE_EXEMPT, exempt):
+                problems = "\n".join(check(src))
+        self.assertNotIn("patterns.py", problems)
+        self.assertIn("rules.py: 252 lines", problems)
 
 
 if __name__ == "__main__":

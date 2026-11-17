@@ -13,12 +13,13 @@ also shows that the rules do not depend on any one language.
 ```bash
 python3 app.py courses                    # courses and seats
 python3 app.py students                   # who can enroll
+python3 app.py roster                     # who is in which course (a read model)
 python3 app.py enroll 3 CS101             # Chen Wei takes the last CS101 seat
 python3 app.py transfer 2 MATH120 ENG105  # two courses change in one UnitOfWork
 python3 app.py work                       # send confirmation emails (to var/mail.log)
 python3 app.py config Course              # each setting and where its value came from
 python3 app.py serve                      # web app on http://127.0.0.1:8080
-python3 run_tests.py                      # architecture check, type check, 35 tests
+python3 run_tests.py                      # architecture check, type check, 38 tests
 ```
 
 Delete `var/app.sqlite` to start over with the demo data.
@@ -34,6 +35,7 @@ config/            # overrides only, one file per owner; belongs to whoever runs
 src/
   shared/          # contracts no entity owns: UnitOfWork, Clock, Mailer, MessageBus
                    #   plus AppSettings (ownerless settings)
+    class_roster/  #   a read model: who is in which course, across courses and students
   entities/
     student/       # Student, Email (checks itself), StudentStore (contract)
     course/        # Course (owns its enrollments), Seats, Enrollment,
@@ -43,9 +45,10 @@ src/
     drop/          # one entity, one write
     transfer/      # two entities, so it asks for a UnitOfWork
     list_courses/  # read-only, returns plain rows for its view
+    list_roster/   # reads the class_roster read model, shapes lines for the CLI
     send_enrollment_confirmation/  # reacts to StudentEnrolled after commit
   integrations/
-    database/      # SQLite stores, outbox, SqlUnitOfWork, demo seeder
+    database/      # SQLite stores, outbox, SqlUnitOfWork, the roster query, demo seeder
     config/        # ConfigLoader: default, then file, then environment
     email/         # FileMailer (writes to var/mail.log)
     clock/         # SystemClock

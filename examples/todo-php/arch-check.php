@@ -6,7 +6,8 @@
  *
  *  Rules:
  *  - Nothing in src/ uses `extends`, except a custom exception that
- *    extends one built-in exception (PHP only throws Throwables).
+ *    extends one built-in exception (PHP only throws Throwables), and
+ *    nothing uses a trait (arch-check-inheritance.php).
  *  - Entities/<Name>/ imports only its own folder.
  *  - Features/<Group>/<Name>/ (or Features/<Name>/) imports Entities,
  *    Shared, and its own feature folder only.
@@ -23,15 +24,10 @@
  *
  *  Pass a folder to check another tree: php arch-check.php <folder> */
 
-$root = $argv[1] ?? __DIR__ . '/src';
+require __DIR__ . '/arch-check-inheritance.php';
 
-function isBuiltInException(string $name): bool
-{
-    return class_exists($name, false)
-        && (new ReflectionClass($name))->isInternal()
-        && is_a($name, Throwable::class, true);
-}
-$files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root));
+$root = $argv[1] ?? __DIR__ . '/src';
+$files =new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root));
 $violations = [];
 
 foreach ($files as $file) {
@@ -69,11 +65,8 @@ foreach ($files as $file) {
         continue;
     }
 
-    preg_match_all('/\bextends\s+\\\\?([A-Za-z_][A-Za-z0-9_\\\\]*)/', $code, $parents);
-    foreach ($parents[1] as $parent) {
-        if (!isBuiltInException($parent)) {
-            $violations[] = "$rel: extends $parent (no inheritance)";
-        }
+    foreach (inheritanceProblems($code) as $problem) {
+        $violations[] = "$rel: $problem";
     }
 
     $ownDir = implode('\\', array_slice($partsPath, 0, -1));

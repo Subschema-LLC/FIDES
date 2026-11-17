@@ -3,19 +3,28 @@
 ## 0.3 (2026-11-17)
 
 Findings from mapping a Symfony 7.4 app (about 450 PHP files, a DI container,
-YAML settings edited from an admin screen) onto FIDES. FIDES is an approach,
-not a framework, and this release says how it fits inside one.
+YAML settings edited from an admin screen) onto FIDES, and from an outside
+review of draft 0.2. FIDES is an approach, not a framework, and this release
+says how it fits inside one.
 
 ### Rules
 
+- **Rule 3, entities stand alone,** points reads that span entities to a
+  read model: a read-only query contract in `shared/<read_model>/`, fulfilled
+  by an integration with one query.
 - **Rule 8, no inheritance,** allows one more `extends`, in every zone: a
   custom error extending one built-in exception type, where an error has to
   extend it to be thrown or to carry a stack trace (PHP, Python, Java, C#,
-  JavaScript). Never one custom error extending another.
+  JavaScript). Never one custom error extending another. Code mixed into a
+  class (PHP traits, mixins) counts as inheritance: none in the core, and a
+  framework-required one stays at the edge.
 - **Rule 11, settings,** defines "once at startup": once per process for a
   long-running server, once per request where the runtime builds the app for
   each request, as PHP usually does. Settings stay frozen for each unit of
   work.
+- **Rule 16, small and shallow,** says a split names its concept, and lets a
+  data file (a lookup table, generated code) skip the size limits when the
+  checker lists it with its reason. Logic never does.
 - **Rule 17, rules are required, tools are examples,** says to keep a
   framework's conventions and map the zones onto them.
 
@@ -23,21 +32,31 @@ not a framework, and this release says how it fits inside one.
 
 - `frameworks.md` (new): where a framework's pieces go, what stays explicit
   with a dependency-injection container, the clash over `config/`, settings a
-  framework compiles into a cache, base classes, and moving in a piece at a
-  time.
+  framework compiles into a cache, ORMs without associations between entities
+  (foreign keys stay in the schema), template inheritance kept inside
+  delivery, base classes and traits, and moving in a piece at a time.
+- `structure.md`: read models (two entities or more, read-only, pure data,
+  one query, used by features), size exemptions, new glossary term.
 - `configuration.md`: what startup means for each runtime, and settings
   edited through the app.
-- `languages.md`: custom errors in every language, and what startup means in
-  PHP.
-- `structure.md`, `why.md`, `ai.md`, `README.md`: wiring with a container,
-  the `config/` pointer, the exception allowance, frameworks as a good fit.
+- `languages.md`: custom errors in every language, traits and mixins, and
+  what startup means in PHP.
+- `why.md`, `ai.md`, `README.md`: wiring with a container, the `config/`
+  pointer, the exception allowance, read models as a cost and in the AGENTS.md
+  template, frameworks as a good fit.
 
 ### Examples
 
+- The Python example has a read model, `shared/class_roster/`, answered by
+  one SQLite join and read by a new `list_roster` feature (`python3 app.py
+  roster`).
 - Both architecture checks allow a custom error extending one built-in
-  exception and still fail on any other parent. `arch-check.php` takes a
-  folder to check, so a new test can run it on a throwaway tree.
-- Test counts: 35 in the Python example (from 34), 23 plus the architecture
+  exception and still fail on any other parent. The PHP check moved its
+  inheritance part to `arch-check-inheritance.php`, which reads PHP tokens and
+  also fails on traits. `arch-check.php` takes a folder to check, so a new
+  test runs it on a throwaway tree of rule breaks.
+- `arch_check.py` has a `SIZE_EXEMPT` list, empty in this app, with a test.
+- Test counts: 38 in the Python example (from 34), 23 plus the architecture
   check in the PHP example (its README said 21).
 
 ### What the app taught
@@ -52,6 +71,8 @@ not a framework, and this release says how it fits inside one.
   which integration fulfills a contract, so the bindings need one file.
 - **`config/` already has an owner.** Symfony, Laravel and Rails put code-owned
   configuration there. The rule is about ownership, not the folder name.
+- **Reads were the gap.** An analytics app is mostly reads across entities.
+  Read rows covered one entity's lists, and nothing had a place for a join.
 
 ## 0.2 (2026-11-13)
 

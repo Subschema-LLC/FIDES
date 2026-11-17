@@ -7,8 +7,8 @@ How each one is met can follow the framework, as long as the rule's *why*
 still holds.
 
 This page covers what changes inside a framework: where its pieces go, the
-container, the `config/` folder, settings the framework compiles, base
-classes, and moving in a piece at a time.
+container, the `config/` folder, settings the framework compiles, ORMs,
+templates, base classes and traits, and moving in a piece at a time.
 
 ## Where the framework's pieces go
 
@@ -16,9 +16,9 @@ classes, and moving in a piece at a time.
 |---|---|---|
 | Controllers, route handlers, console commands, queue consumers, scheduled jobs | delivery | Thin: read the input, call a feature, shape the output |
 | The container's configuration | delivery's wiring | See [Containers](#containers-what-stays-explicit) |
-| Templates | feature views and page templates | Point the template loader at feature folders: a Twig namespace, a Blade view path, a Django template directory |
-| Active-record models (Eloquent, ActiveRecord, Django models) | integrations | They inherit from the framework, so they are the store's records, not entities. The store maps them to plain entities |
-| Data-mapper ORM mapping (Doctrine, JPA, Entity Framework) | integrations | Keep the mapping outside the entity where the ORM allows it (XML, PHP or fluent mapping), so the store saves a plain entity |
+| Templates | feature views and page templates | See [Templates](#templates) |
+| Active-record models (Eloquent, ActiveRecord, Django models) | integrations | They inherit from the framework, so they are the store's records, not entities. See [ORMs](#orms) |
+| Data-mapper ORM mapping (Doctrine, JPA, Entity Framework) | integrations | See [ORMs](#orms) |
 | Framework events and listeners | messages, and the features that react to them | Dispatched after commit, from the outbox ([changes.md](changes.md)) |
 | Form types and request validation | delivery | They check the shape of input. Rules that are true everywhere live in entities and values |
 | The framework's `config/` folder | not FIDES's `config/` | See [The config/ folder](#the-config-folder) |
@@ -101,10 +101,54 @@ through the FIDES loader at startup instead, so an edited override applies at
 the next startup ([configuration.md](configuration.md#what-startup-means)). In
 PHP's usual model, that is the next request.
 
-## Base classes and attributes
+## ORMs
 
-Rule 8 allows a framework's required base class at the edge, kept thin. Before
-subclassing, check whether the framework still requires it:
+An ORM pulls toward an object graph: entities that hold each other and load
+each other on demand (`$course->getStudents()`). FIDES entities refer to each
+other by id, so FIDES gives that graph up on purpose:
+
+- **No associations between entities.** Map another entity's id as a plain
+  value (`string $courseId`), or as a small id value through the ORM's own
+  tools (Doctrine embeddables or a custom DBAL type), never as an entity
+  reference (`ManyToOne`, `OneToMany`). Inside one entity's consistency
+  boundary, such as a Course and its own enrollments, associations are fine.
+- **Foreign keys stay in the database.** The schema still declares them, so
+  the database guards referential integrity. Only the ORM mapping treats the
+  column as a plain value.
+- **The mapping stays in integrations.** Either map the entity itself with the
+  ORM's external mapping (XML, PHP or fluent configuration) when its shape
+  fits, or map a record class in integrations and let the store copy between
+  record and entity. Active-record ORMs always need the record form, because
+  the model inherits from the framework.
+- **Reads across entities use a read model**
+  ([structure.md](structure.md#read-models)), usually one SQL query or a
+  database view, outside the ORM's object graph.
+
+You lose lazy loading and walking from one object to the next. In exchange,
+each entity loads and saves on its own, and no query hides behind a getter.
+
+## Templates
+
+Template inheritance (`{% extends %}` in Twig and Jinja, `@extends` in Blade)
+is inheritance between templates, not between units of code. It stays inside
+delivery:
+
+- **A page template may extend the layout.** Both live in delivery.
+- **A feature view is a fragment.** It extends nothing and includes only its
+  own partials, never another feature's view or a page template. The page
+  template includes it (rule 14).
+- **Point the template loader at feature folders,** so a view stays beside its
+  feature: a Twig namespace (`@Features/ListTodos/ListTodosView.html.twig`), a
+  Blade view path, a Django template directory.
+- **Escape by default, keep logic out.** Twig, Blade and Jinja escape by
+  default but can run logic, so check in the build that a feature view names
+  no entity and extends or includes nothing outside its folder (rules 13 and
+  14).
+
+## Base classes and traits
+
+Rule 8 allows a framework's required base class or trait at the edge, kept
+thin. Before using one, check whether the framework still requires it:
 
 - Symfony controllers never needed `AbstractController`, and since Symfony 7.3
   console commands need not extend `Command`.
@@ -112,6 +156,9 @@ subclassing, check whether the framework still requires it:
 - Spring controllers are plain classes with annotations.
 - Rails controllers and Django class-based views do need a base class. Keep
   them thin, in delivery.
+- Symfony's kernel needs `BaseKernel` and `MicroKernelTrait`. It is delivery:
+  the door the framework starts from. List it in the checker as the one
+  allowed parent and trait, with the reason.
 
 A helper a base class used to give you (a redirect, a flash message,
 rendering) becomes a small object passed in through the constructor.

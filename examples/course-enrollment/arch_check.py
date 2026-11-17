@@ -12,7 +12,8 @@ Run it in the build so a person or an AI agent cannot quietly break a rule.
   No inheritance  classes may only subclass Protocol (a contract), or one built-in
                exception (a custom error), never another class of the app
   Spread       at most zone/owner/file deep (delivery: delivery/door/page/file),
-               100-character lines, 200-line files
+               100-character lines, 200-line files (data files listed in SIZE_EXEMPT,
+               each with its reason, skip the size limits; logic never does)
   Pages        each folder in delivery/web/ is one page: <page>.py, plus files named
                <page>.html, <page>.css, <page>.js or <page>_<part>.<ext>
 
@@ -34,6 +35,9 @@ IO_MODULES = {"os", "sys", "io", "pathlib", "shutil", "subprocess", "socket", "s
 CLOCK_CALLS = ("datetime.now", "datetime.utcnow", "datetime.today", "date.today",
                "time.time", "time.time_ns", "time.monotonic")
 MAX_LINE, MAX_LINES, MAX_DEPTH = 100, 200, 3
+# Files that are data, not logic (a lookup table, generated code), and why each may
+# pass the size limits. This app needs none.
+SIZE_EXEMPT: dict[str, str] = {}
 BUILTIN_EXCEPTIONS = {name for name, value in vars(builtins).items()
                       if isinstance(value, type) and issubclass(value, BaseException)}
 
@@ -55,6 +59,8 @@ def check_spread(src: Path, path: Path) -> list[str]:
     if len(rel.parts) > depth:
         shape = "delivery/door/page/file" if rel.parts[0] == "delivery" else "zone/owner/file"
         problems.append(f"{rel}: deeper than {shape}")
+    if rel.as_posix() in SIZE_EXEMPT:
+        return problems
     lines = path.read_text(encoding="utf-8").splitlines()
     if len(lines) > MAX_LINES:
         problems.append(f"{rel}: {len(lines)} lines (max {MAX_LINES}); a concept is hiding in it")

@@ -65,6 +65,7 @@ AGENTS.md            # the rules on one page, for AI agents and people
 config/              # overrides only, one file per owner
 src/
   shared/            # ownerless contracts: UnitOfWork, Clock, Mailer, MessageBus
+    class_roster/    # a read model: a read-only query across entities
   entities/
     course/          # Course, its values, messages, settings, store contract
     student/
@@ -129,7 +130,7 @@ More in [docs/why.md](docs/why.md).
 
 [examples/course-enrollment](examples/course-enrollment) is a small Python app
 (standard library only) where students enroll in, drop and transfer between
-courses. It shows every rule in working code, with 35 tests, an architecture
+courses. It shows every rule in working code, with 38 tests, an architecture
 check, and a type check when mypy is installed.
 
 ```bash

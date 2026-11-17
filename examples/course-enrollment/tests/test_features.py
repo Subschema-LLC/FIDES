@@ -6,13 +6,16 @@ from entities.course.course import Course
 from entities.course.course_settings import CourseSettings
 from entities.student.email import Email
 from entities.student.student import Student
-from fakes import FakeCourseStore, FakeStudentStore, FixedClock, RecordingMailer, RunNowUnitOfWork
+from fakes import (FakeClassRoster, FakeCourseStore, FakeStudentStore, FixedClock,
+                   RecordingMailer, RunNowUnitOfWork)
 from features.enroll.enroll import Enroll
 from features.list_courses.list_courses import ListCourses
+from features.list_roster.list_roster import ListRoster
 from features.send_enrollment_confirmation.send_enrollment_confirmation import (
     SendEnrollmentConfirmation,
 )
 from features.transfer.transfer import Transfer
+from shared.class_roster.class_roster import RosterRow
 
 ANA = Student(1, "Ana Ruiz", Email.parse("ana@example.edu"))
 DANA = Student(4, "Dana Lopez", Email.parse("dana@example.edu"), active=False)
@@ -68,6 +71,14 @@ class ListCoursesTest(unittest.TestCase):
         rows = ListCourses(FakeCourseStore(full)).execute()
         self.assertEqual((rows[0].code, rows[0].seats_left, rows[0].availability),
                          ("MATH120", 0, "full"))
+
+
+class ListRosterTest(unittest.TestCase):
+    def test_shapes_one_line_per_enrollment_from_the_read_model(self) -> None:
+        row = RosterRow("CS101", "Intro", 1, "Ana Ruiz", FixedClock().now())
+        line = ListRoster(FakeClassRoster(row)).execute()[0]
+        self.assertEqual((line.course, line.student, line.enrolled_on),
+                         ("CS101 Intro", "Ana Ruiz (#1)", FixedClock().now().date().isoformat()))
 
 
 class SendEnrollmentConfirmationTest(unittest.TestCase):

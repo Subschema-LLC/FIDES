@@ -15,6 +15,7 @@ checks most of it and fails the build when a rule is broken. Install mypy
 | A new web page | `src/delivery/web/<page>/`: `<page>.py`, `<page>.html`, and any page-specific `.css` or `.js` |
 | A new way the app reaches the outside world | `src/integrations/`, behind a contract |
 | A contract no single entity owns | `src/shared/` |
+| A read across two entities or more | a read model: `src/shared/<read_model>/` holds only the query contract and its rows; an integration answers it with one query |
 | A setting | declared with its default in the owner's settings class |
 | An override for a setting | `config/<Owner>.toml` (never inside `src/`) |
 
@@ -27,6 +28,7 @@ integration, stop and ask whether a concept is being spread too far.
    Reading through properties is fine.
 2. **Entities stand alone.** An entity imports only its own folder. Refer to
    another entity by id, never by object. Cross-entity rules live in features.
+   Cross-entity reads go through a read model (`shared/class_roster/`).
 3. **One use case per feature folder,** readable top to bottom, with its view
    and CSS beside it. Features never import other features. They react to
    messages instead.
