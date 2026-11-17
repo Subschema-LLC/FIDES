@@ -47,6 +47,7 @@ API, CLI, background jobs).
 | The backend behind a single-page or mobile app | The SPA is just another delivery client |
 | CLIs and workers sharing rules with a web app | Same features, different delivery |
 | One service inside a larger system | Each service can be FIDES inside; the outbox carries messages out |
+| Apps built on a framework (Symfony, Laravel, Rails, Django, Spring, ASP.NET Core) | FIDES is an approach, not a framework: its zones map onto the framework's conventions ([frameworks.md](frameworks.md)) |
 
 | Poor fit | Why |
 |---|---|
@@ -64,7 +65,9 @@ FIDES is not free. Know the costs before adopting it:
   large files spread across many places.
 - **Explicit wiring.** One file builds every object by hand. It is long and
   boring, which is the point: it is the one place that shows how the app is
-  connected.
+  connected. In a framework with a dependency-injection container, the
+  container builds the objects and that file shrinks to one line per
+  contract, binding it to its integration ([frameworks.md](frameworks.md)).
 - **Some repetition.** Because entities never import each other, two entities
   may each declare a small thing (such as a message contract) that a layered
   app would share.
@@ -99,7 +102,9 @@ What is different from those sources:
 
 - **Entities never import each other.** Cross-entity rules always live in a
   feature.
-- **No inheritance anywhere,** not just "prefer composition".
+- **No inheritance anywhere,** not just "prefer composition". The one
+  allowance is a custom error extending its language's built-in exception,
+  where the language requires it.
 - **Configuration has an ownership model:** declared by the owner in code,
   overridden by the operator outside the code.
 - **Designed for AI agents as well as people:** one-page rules, a predictable

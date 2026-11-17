@@ -36,8 +36,11 @@ integration, stop and ask whether a concept is being spread too far.
 5. **Dependencies point inward.** Features import entities and shared.
    Integrations import entities and shared. Delivery imports features and
    shared. Only `delivery/wiring.py` imports integrations.
-6. **No inheritance.** Compose small objects. The only base class allowed is
-   `Protocol`, for contracts. Integrations fulfill contracts without inheriting.
+6. **No inheritance.** Compose small objects. The only base classes allowed are
+   `Protocol`, for contracts, and one built-in exception, for a custom error
+   (`class CourseFull(ValueError)`). Integrations fulfill contracts without
+   inheriting. This app needs no custom errors: a built-in one with a clear
+   message is usually enough.
 7. **Messages are recorded, saved, then dispatched.** Entities record them,
    stores save them in the same write, the worker dispatches them after
    commit. Never send email or call out from inside a change. Handlers must be

@@ -6,7 +6,7 @@ FIDES is a way to structure software so it stays simple, readable and
 encapsulated, for the people who write it and for the AI agents that help
 them. It works in any programming language.
 
-> **Status:** draft 0.2. The rules are being tested against real apps and
+> **Status:** draft 0.3. The rules are being tested against real apps and
 > will change. See [CHANGELOG.md](CHANGELOG.md) for what changed and why.
 
 ## The problem
@@ -32,7 +32,8 @@ one place, and enforces a short list of rules with an automated check.
   The outside world stays at the edges.
 - **No inheritance.** Small units are composed, never extended.
 - **Rules are required, tools are examples.** FIDES says what must be true,
-  not which library to use.
+  not which library to use. It is an approach, not a framework: it fits
+  inside the framework you already use.
 
 **The test:** a new developer, or an AI agent, understands any feature in
 five minutes, and you can come back after six months and find your way.
@@ -48,7 +49,9 @@ five minutes, and you can come back after six months and find your way.
 | **S**hared | contracts that no single entity owns | `shared/unit_of_work` |
 
 Outside `src/`, a `config/` folder holds the setting overrides that belong to
-whoever runs the app.
+whoever runs the app. Where a framework already uses `config/` for its own
+files, the overrides get a folder of their own
+([docs/frameworks.md](docs/frameworks.md#the-config-folder)).
 
 *Fides* is also Latin for good faith: keeping your word. Every unit promises
 something through its contract and keeps that promise. The acronym is a memory
@@ -94,6 +97,8 @@ views, `.css`, `.js` and `config/`.
 - The backend behind a single-page or mobile app
 - CLIs and background workers that share rules with a web app
 - One service inside a larger system
+- Apps built on a framework (Symfony, Laravel, Rails, Django, Spring,
+  ASP.NET Core): the zones map onto the framework instead of replacing it
 
 **Poor fit**
 - The single-page app itself (React, Vue, Svelte) and other rich clients
@@ -117,12 +122,14 @@ More in [docs/why.md](docs/why.md).
    C#, Go and Rust
 8. [Moving an existing app](docs/migrating.md): change the structure and prove
    nothing else changed
+9. [Inside a framework](docs/frameworks.md): containers, `config/`, compiled
+   settings and base classes in Symfony, Laravel, Rails, Spring and others
 
 ## Example
 
 [examples/course-enrollment](examples/course-enrollment) is a small Python app
 (standard library only) where students enroll in, drop and transfer between
-courses. It shows every rule in working code, with 34 tests, an architecture
+courses. It shows every rule in working code, with 35 tests, an architecture
 check, and a type check when mypy is installed.
 
 ```bash

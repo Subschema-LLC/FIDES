@@ -64,7 +64,8 @@ This app follows FIDES. Run `<check command>` before you finish.
 3. One use case per feature folder. Features never import each other.
 4. The core never touches the database, files, network, environment or clock.
 5. Dependencies point inward. Only wiring imports integrations.
-6. No inheritance. Compose. Contracts are interfaces.
+6. No inheritance. Compose. Contracts are interfaces. A custom error may
+   extend one built-in exception, nothing else.
 7. Messages: entities record, stores save with the change, a worker dispatches.
 8. One write by default. UnitOfWork only when two entities change.
 9. Settings: declared in code, overridden in config/, then env. Secrets: env only.
