@@ -1,0 +1,15 @@
+#!/usr/bin/env php
+<?php
+/** The command-line door: php bin/console todo:list (and todo:add, todo:done,
+ *  todo:config), plus Symfony's own commands such as lint:container. */
+
+use App\Delivery\Kernel;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Input\ArgvInput;
+
+require dirname(__DIR__) . '/vendor/autoload.php';
+
+$input = new ArgvInput();
+$env = (string) $input->getParameterOption(['--env', '-e'], getenv('APP_ENV') ?: 'dev', true);
+$kernel = new Kernel($env, $env !== 'prod');
+(new Application($kernel))->run($input);

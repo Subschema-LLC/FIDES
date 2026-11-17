@@ -1,0 +1,6 @@
+# Routes are attributes on the delivery classes that answer them.
+delivery:
+    resource:
+        path: ../src/Delivery/
+        namespace: App\Delivery
+    type: attribute

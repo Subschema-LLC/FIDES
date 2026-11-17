@@ -27,7 +27,7 @@
 require __DIR__ . '/arch-check-inheritance.php';
 
 $root = $argv[1] ?? __DIR__ . '/src';
-$files =new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root));
+$files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root));
 $violations = [];
 
 foreach ($files as $file) {

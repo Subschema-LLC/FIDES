@@ -1,0 +1,43 @@
+{# Feature view for ListTodos. Displays shaped TodoRow values only.
+   Values: rows (list of TodoRow), csrf, actionPath, returnTo. #}
+<section class="todo-list-section" data-todo-list>
+{% if rows is empty %}
+  <p class="muted">Nothing here yet. Add your first to-do to get started.</p>
+{% else %}
+  <div class="todo-filters" role="toolbar" aria-label="Filter to-dos">
+    <button type="button" class="filter-btn active" data-todo-filter="all">
+      All ({{ rows|length }})
+    </button>
+    <button type="button" class="filter-btn" data-todo-filter="open">Open</button>
+    <button type="button" class="filter-btn" data-todo-filter="done">Done</button>
+  </div>
+  <ul class="todos">
+  {% for row in rows %}
+    <li class="{{ row.status }}" data-status="{{ row.status }}">
+      <span class="title">{{ row.title }}</span>
+      <span class="todo-meta">
+        {% if row.done %}
+          <span class="state">done {{ row.completedDate }}</span>
+          {{ _self.action(row.id, 'reopen', 'Reopen', csrf, actionPath, returnTo) }}
+        {% else %}
+          <span class="state">added {{ row.createdDate }}</span>
+          {{ _self.action(row.id, 'complete', 'Done', csrf, actionPath, returnTo) }}
+        {% endif %}
+        {{ _self.action(row.id, 'delete', 'Delete', csrf, actionPath, returnTo) }}
+      </span>
+    </li>
+  {% endfor %}
+  </ul>
+{% endif %}
+</section>
+
+{% macro action(id, action, label, csrf, actionPath, returnTo) %}
+  <form method="post" action="{{ actionPath }}">
+    <input type="hidden" name="_csrf" value="{{ csrf }}">
+    <input type="hidden" name="return_to" value="{{ returnTo }}">
+    <input type="hidden" name="action" value="{{ action }}">
+    <input type="hidden" name="id" value="{{ id }}">
+    {% set danger = action == 'delete' ? 'btn-danger' : '' %}
+    <button type="submit" class="{{ danger }}">{{ label }}</button>
+  </form>
+{% endmacro %}
