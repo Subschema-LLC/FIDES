@@ -22,6 +22,8 @@ function check(bool $ok, string $name): void
 // Architecture first: a broken shape fails the whole run.
 passthru('php ' . escapeshellarg($root . '/arch-check.php'), $archExit);
 check($archExit === 0, 'arch-check passes');
+passthru('php ' . escapeshellarg(__DIR__ . '/arch-check-cases.php'), $casesExit);
+check($casesExit === 0, 'arch-check allows only built-in exception parents');
 
 use App\Delivery\Web\WebApp;
 use App\Entities\TodoItem\TodoItem;

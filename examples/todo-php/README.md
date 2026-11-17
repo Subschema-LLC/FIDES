@@ -24,7 +24,7 @@ php app.php reopen 1                 # put it back
 php app.php delete 1                 # remove it
 php app.php config TodoItem          # each setting and where its value came from
 php app.php serve                    # web app on http://127.0.0.1:8080 (/ and /todo)
-php tests/run.php                    # architecture check + 21 tests
+php tests/run.php                    # architecture check + 23 tests
 php arch-check.php                   # the architecture check on its own
 ```
 
@@ -125,7 +125,9 @@ var/                                       # todos.sqlite lives here (not commit
   integration fulfills it. Only `Delivery/Wiring.php` knows the
   SQLite store exists.
 - **No inheritance.** There is no `extends` anywhere in `src/`,
-  and arch-check fails if one appears.
+  and arch-check fails if one appears. The one `extends` it
+  allows is a custom exception extending a built-in exception,
+  because PHP only throws `Throwable`s; this app needs none.
 - **Time is passed in.** Features take the time from the Clock
   contract and hand it to the entity, so a test can state exactly
   what "now" means.

@@ -61,7 +61,10 @@ worker that dispatches messages. Delivery translates input into feature calls
 and feature results into output. It holds no business rules.
 
 One file in delivery, **wiring**, builds the whole object graph at startup.
-It is the only file that knows integrations exist.
+It is the only file that knows integrations exist. In a framework with a
+dependency-injection container, the container builds the objects and the
+wiring file binds every contract to its integration
+([frameworks.md](frameworks.md#containers-what-stays-explicit)).
 
 #### Pages
 
@@ -150,7 +153,7 @@ who handles it, and nothing on the page is owned twice.
 
 | Path | Holds |
 |---|---|
-| `config/` | Setting overrides, one file per owner, owned by whoever runs the app |
+| `config/` | Setting overrides, one file per owner, owned by whoever runs the app (a folder of their own where the framework already uses `config/`: see [frameworks.md](frameworks.md#the-config-folder)) |
 | `tests/` | Entity tests (no fakes), feature tests (with fakes), integration tests |
 | `AGENTS.md` | The rules on one page, for AI agents and people |
 | the checker | A script that fails the build when a rule is broken |
@@ -273,4 +276,4 @@ Spread has a vertical side too:
 | Slot | Ready-made HTML a page hands into a feature view, such as another feature's form |
 | Read row | A small typed, read-only record a store returns for lists and screens |
 | Settings | An owner's tunable values, declared in code with defaults and rules |
-| Wiring | The one file that builds the app from its parts |
+| Wiring | The one file that builds the app from its parts; with a dependency-injection container, the one file that binds every contract to its integration |

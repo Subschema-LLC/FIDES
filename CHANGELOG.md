@@ -1,5 +1,58 @@
 # Changelog
 
+## 0.3 (2026-11-17)
+
+Findings from mapping a Symfony 7.4 app (about 450 PHP files, a DI container,
+YAML settings edited from an admin screen) onto FIDES. FIDES is an approach,
+not a framework, and this release says how it fits inside one.
+
+### Rules
+
+- **Rule 8, no inheritance,** allows one more `extends`, in every zone: a
+  custom error extending one built-in exception type, where an error has to
+  extend it to be thrown or to carry a stack trace (PHP, Python, Java, C#,
+  JavaScript). Never one custom error extending another.
+- **Rule 11, settings,** defines "once at startup": once per process for a
+  long-running server, once per request where the runtime builds the app for
+  each request, as PHP usually does. Settings stay frozen for each unit of
+  work.
+- **Rule 17, rules are required, tools are examples,** says to keep a
+  framework's conventions and map the zones onto them.
+
+### Docs
+
+- `frameworks.md` (new): where a framework's pieces go, what stays explicit
+  with a dependency-injection container, the clash over `config/`, settings a
+  framework compiles into a cache, base classes, and moving in a piece at a
+  time.
+- `configuration.md`: what startup means for each runtime, and settings
+  edited through the app.
+- `languages.md`: custom errors in every language, and what startup means in
+  PHP.
+- `structure.md`, `why.md`, `ai.md`, `README.md`: wiring with a container,
+  the `config/` pointer, the exception allowance, frameworks as a good fit.
+
+### Examples
+
+- Both architecture checks allow a custom error extending one built-in
+  exception and still fail on any other parent. `arch-check.php` takes a
+  folder to check, so a new test can run it on a throwaway tree.
+- Test counts: 35 in the Python example (from 34), 23 plus the architecture
+  check in the PHP example (its README said 21).
+
+### What the app taught
+
+- **PHP cannot follow "no inheritance" to the letter.** A class can only be
+  thrown if it extends a built-in exception. The Python example never defined
+  a custom error, so the rule never met the case.
+- **"Startup" means different things.** Under PHP-FPM the app starts on every
+  request, which is what lets an admin screen's edit apply without a cache
+  clear.
+- **A container is the wiring, but not a readable one.** Autowiring hides
+  which integration fulfills a contract, so the bindings need one file.
+- **`config/` already has an owner.** Symfony, Laravel and Rails put code-owned
+  configuration there. The rule is about ownership, not the folder name.
+
 ## 0.2 (2026-11-13)
 
 Findings from moving a production PHP app onto FIDES: about 30 features,

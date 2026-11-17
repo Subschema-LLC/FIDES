@@ -9,7 +9,8 @@ Run it in the build so a person or an AI agent cannot quietly break a rule.
                integrations/X-> entities, shared, integrations/X
                delivery      -> features, shared, delivery (wiring.py may import anything)
   Core is pure entities, features and shared never import I/O modules or read the clock
-  No inheritance  classes may only subclass Protocol (a contract)
+  No inheritance  classes may only subclass Protocol (a contract), or one built-in
+               exception (a custom error), never another class of the app
   Spread       at most zone/owner/file deep (delivery: delivery/door/page/file),
                100-character lines, 200-line files
   Pages        each folder in delivery/web/ is one page: <page>.py, plus files named
@@ -22,6 +23,7 @@ run code.
 """
 
 import ast
+import builtins
 import sys
 from pathlib import Path
 
@@ -32,6 +34,8 @@ IO_MODULES = {"os", "sys", "io", "pathlib", "shutil", "subprocess", "socket", "s
 CLOCK_CALLS = ("datetime.now", "datetime.utcnow", "datetime.today", "date.today",
                "time.time", "time.time_ns", "time.monotonic")
 MAX_LINE, MAX_LINES, MAX_DEPTH = 100, 200, 3
+BUILTIN_EXCEPTIONS = {name for name, value in vars(builtins).items()
+                      if isinstance(value, type) and issubclass(value, BaseException)}
 
 
 def check(src: Path) -> list[str]:
@@ -89,7 +93,7 @@ def check_python(src: Path, path: Path) -> list[str]:
             if reason:
                 line = getattr(node, "lineno", 0)
                 problems.append(f"{rel}:{line}: imports {module}, but {reason}")
-        if isinstance(node, ast.ClassDef) and not all(is_protocol(b) for b in node.bases):
+        if isinstance(node, ast.ClassDef) and not allowed_bases(node.bases):
             problems.append(f"{rel}:{node.lineno}: {node.name} inherits; compose instead")
         if zone in CORE and isinstance(node, ast.Call) and reads_clock(node):
             problems.append(f"{rel}:{node.lineno}: reads the clock; pass the time in")
@@ -122,6 +126,15 @@ def import_problem(zone: str, owner: str, rel: Path, module: str) -> str:
         is_wiring = rel.as_posix() == "delivery/wiring.py"
         allowed = is_wiring or target in ("features", "shared", "delivery")
     return "" if allowed else f"{zone}/{owner or rel.name} may not import from {target}"
+
+
+def allowed_bases(bases: list[ast.expr]) -> bool:
+    """Contracts subclass Protocol. A custom error may subclass one built-in exception,
+    because Python only raises exceptions."""
+    base = bases[0] if len(bases) == 1 else None
+    if isinstance(base, ast.Name) and base.id in BUILTIN_EXCEPTIONS:
+        return True
+    return all(is_protocol(b) for b in bases)
 
 
 def is_protocol(base: ast.expr) -> bool:

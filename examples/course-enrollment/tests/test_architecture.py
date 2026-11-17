@@ -47,6 +47,17 @@ class ArchitectureTest(unittest.TestCase):
                          "deeper than delivery/door/page/file"):
             self.assertIn(expected, problems)
 
+    def test_a_custom_error_may_extend_one_builtin_exception(self) -> None:
+        errors = ("class CourseFull(ValueError):\n    pass\n\n\n"
+                  "class WaitlistFull(CourseFull):\n    pass\n")
+        with tempfile.TemporaryDirectory() as folder:
+            src = Path(folder)
+            (src / "entities/course").mkdir(parents=True)
+            (src / "entities/course/course_full.py").write_text(errors, encoding="utf-8")
+            problems = "\n".join(check(src))
+        self.assertNotIn("CourseFull inherits", problems)
+        self.assertIn("WaitlistFull inherits", problems)
+
 
 if __name__ == "__main__":
     unittest.main()

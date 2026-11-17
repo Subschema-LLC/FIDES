@@ -21,6 +21,11 @@ This app follows FIDES. Run `php arch-check.php` and
 
 1. **No inheritance.** Never use `extends` in `src/`. Compose small
    objects instead. Classes are `final`; contracts are interfaces.
+   The one exception: PHP only throws `Throwable`s, so a custom
+   exception may extend one built-in exception
+   (`final class TodoMissing extends \RuntimeException`), never
+   another custom exception. A built-in exception with a clear
+   message is usually enough, as everywhere in this app today.
 2. **Entities hold rules that are true everywhere.** An entity
    imports only its own folder. It owns what it must keep
    consistent and saves in a single store write. (TodoItem owns its

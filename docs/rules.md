@@ -58,8 +58,15 @@ change least (the rules), never the reverse.*
 protocols or traits, and implementations fulfill them without extending
 anything. If a framework forces you to subclass one of its types, keep that
 class at the edge (delivery or integrations), thin and with no rules in it.
+One allowance holds in every zone: where an error has to extend the
+language's built-in exception type to be thrown, or to carry a stack trace
+(PHP, Python, Java, C#, JavaScript), a custom error may extend one built-in
+exception type, never another custom error. Often no custom error is needed:
+a built-in exception with a clear message is enough.
 **(checkable)**
-*Why: what a unit does is in the unit, not spread up a chain of parents.*
+*Why: what a unit does is in the unit, not spread up a chain of parents. A
+custom error that extends a built-in one adds a name to catch, not a chain to
+climb.*
 
 ## Change
 
@@ -83,8 +90,10 @@ Details: [changes.md](changes.md).
 **11. Settings are declared by their owner and overridden from outside.** The
 owner declares every setting in code with its default and its rules. Overrides
 live in `config/`, outside the source tree, one file per owner. Environment
-variables win over the file. Everything is merged once at startup and frozen.
-Unknown keys and invalid values stop startup. Secrets come from the
+variables win over the file. Everything is merged once per startup and stays
+frozen until the next: once per process for a long-running server, once per
+request where the runtime builds the app for each request, as PHP usually
+does. Unknown keys and invalid values stop startup. Secrets come from the
 environment only.
 *Why: code updates never overwrite an operator's settings, typos fail loudly,
 and there is one answer to "where did this value come from?"*
@@ -142,7 +151,10 @@ kind of code. **(checkable)**
 ## Practice
 
 **17. Rules are required, tools are examples.** FIDES names what must be true,
-never which framework, database or template engine to use. Follow your
+never which framework, database or template engine to use. Inside a
+framework, keep its conventions and map the zones onto them
+([frameworks.md](frameworks.md)); each rule's *why* says what must survive
+the mapping. Follow your
 language's own conventions for naming and syntax — typically `snake_case` in
 module-based languages or `PascalCase` where namespaces and classes map 1:1 to
 folders and files — and keep that single casing consistent across folders,

@@ -5,7 +5,8 @@
  *  php arch-check.php
  *
  *  Rules:
- *  - Nothing in src/ uses `extends`.
+ *  - Nothing in src/ uses `extends`, except a custom exception that
+ *    extends one built-in exception (PHP only throws Throwables).
  *  - Entities/<Name>/ imports only its own folder.
  *  - Features/<Group>/<Name>/ (or Features/<Name>/) imports Entities,
  *    Shared, and its own feature folder only.
@@ -18,9 +19,18 @@
  *  - Views (*View.php) never reference entities; feature views never
  *    render another feature's view or a page template.
  *  - Each page folder in Delivery/Web/<Page>/ has <Page>.php and
- *    <Page>View.php, and all files in the folder are named for the page. */
+ *    <Page>View.php, and all files in the folder are named for the page.
+ *
+ *  Pass a folder to check another tree: php arch-check.php <folder> */
 
-$root = __DIR__ . '/src';
+$root = $argv[1] ?? __DIR__ . '/src';
+
+function isBuiltInException(string $name): bool
+{
+    return class_exists($name, false)
+        && (new ReflectionClass($name))->isInternal()
+        && is_a($name, Throwable::class, true);
+}
 $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root));
 $violations = [];
 
@@ -59,8 +69,11 @@ foreach ($files as $file) {
         continue;
     }
 
-    if (preg_match('/\bextends\s+[A-Za-z]/', $code)) {
-        $violations[] = "$rel: uses extends (no inheritance)";
+    preg_match_all('/\bextends\s+\\\\?([A-Za-z_][A-Za-z0-9_\\\\]*)/', $code, $parents);
+    foreach ($parents[1] as $parent) {
+        if (!isBuiltInException($parent)) {
+            $violations[] = "$rel: extends $parent (no inheritance)";
+        }
     }
 
     $ownDir = implode('\\', array_slice($partsPath, 0, -1));

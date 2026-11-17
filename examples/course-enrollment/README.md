@@ -18,7 +18,7 @@ python3 app.py transfer 2 MATH120 ENG105  # two courses change in one UnitOfWork
 python3 app.py work                       # send confirmation emails (to var/mail.log)
 python3 app.py config Course              # each setting and where its value came from
 python3 app.py serve                      # web app on http://127.0.0.1:8080
-python3 run_tests.py                      # architecture check, type check, 34 tests
+python3 run_tests.py                      # architecture check, type check, 35 tests
 ```
 
 Delete `var/app.sqlite` to start over with the demo data.
