@@ -1,4 +1,4 @@
-# FIDES
+# FIDES Architecture
 
 **Every unit keeps its word.**
 
