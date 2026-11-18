@@ -37,6 +37,36 @@ student cannot enroll") live here, because neither entity owns them.
 Some features react to messages instead of to people
 (`send_enrollment_confirmation` reacts to `StudentEnrolled`).
 
+#### Feature groups
+
+A flat list of action folders is easy to scan at ten features and hard at
+forty. A project may then group its features by area, one level deeper:
+
+```
+features/
+  alerts/                 # a group: the area people look for
+    save_alert_rule/      # the owner: one use case, as before
+    deliver_alert/
+  billing/
+    send_invoice/
+```
+
+- **Name the group for the area people look for,** usually the screen or menu
+  entry the features are reached from, so a person or an AI agent can go
+  straight from what they see in the app to the code.
+- **A group is only a folder.** It holds no files of its own, nothing shared
+  between its features, and no rules. Code two features need belongs in an
+  entity or in shared, exactly as without groups.
+- **The use case stays the owner.** Features in one group still never import
+  each other, and the checker treats `features/<group>/<use_case>/` as the
+  owner.
+- **All or nothing.** Groups are optional, but once a project uses them, every
+  feature sits in one, so a reader never has to guess which shape a folder
+  has. Start with one group per area, and split a group only when another
+  area starts using some of its features.
+- **Entities, shared and integrations do not group.** They stay at
+  `zone/owner/file`; an entity is already one concept.
+
 ### Shared
 
 Contracts that no single entity owns: `UnitOfWork`, `Clock`, `Mailer`,
@@ -276,8 +306,9 @@ concept is spread too far.
 
 Spread has a vertical side too:
 
-- **Shallow.** Never deeper than `zone/owner/file`. The one exception is a
-  page in delivery: `delivery/web/<page>/file`.
+- **Shallow.** Never deeper than `zone/owner/file`. The two exceptions are a
+  page in delivery (`delivery/web/<page>/file`) and a feature in a group
+  (`features/<group>/<use_case>/file`, see [feature groups](#feature-groups)).
 - **Small files.** A file past about 200 lines is hiding another concept.
   Give that concept its own unit, named for it. A data file (a lookup table,
   generated code) may be listed in the checker as an exemption, with its
@@ -308,6 +339,7 @@ Spread has a vertical side too:
 | Store | The contract for finding and saving an entity, fulfilled by an integration |
 | Message | A record of something that happened, saved with the change that caused it |
 | Feature | One use case, in one folder |
+| Feature group | An optional folder over features, named for an area of the app; it holds no code, and each use case in it stays its own owner |
 | Feature view | A template in a feature's folder that displays that feature's values |
 | Page | One screen of a web delivery, in its own folder in delivery: page code, a page template, and any page-specific CSS and JS |
 | Page template | The template that lays out a page and places feature views on it |

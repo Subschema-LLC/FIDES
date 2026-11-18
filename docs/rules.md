@@ -147,14 +147,21 @@ more, a concept is spread too far.
 *Why: the cost of a change is mostly the cost of finding everything it
 touches.*
 
-**16. Small and shallow.** Never deeper than `zone/owner/file`. The one extra
-level is a page in delivery: `delivery/web/<page>/file`. Files stay under
-about 200 lines, lines under about 100 characters. Split by concept, never by
-kind of code, and name the concept: files called `part1` and `part2` hide it.
+**16. Small and shallow.** Never deeper than `zone/owner/file`. Two places get
+one extra level: a page in delivery (`delivery/web/<page>/file`) and a feature
+in a group (`features/<group>/<use_case>/file`). A group is named for the area
+people look for, usually a screen or a menu entry. It is only a folder: it
+holds no code, the use case stays the owner, and features in one group still
+never call each other. Groups are optional; once a project uses them, every
+feature sits in one ([structure.md](structure.md#feature-groups)). Files stay
+under about 200 lines, lines under about 100 characters. Split by concept,
+never by kind of code, and name the concept: files called `part1` and `part2`
+hide it.
 A file that is data, not logic (a lookup table, generated code), may skip the
 size limits when the checker lists it with its reason, in one place where
 review sees it. Logic never does. **(checkable)**
-*Why: code you can see whole is code you can understand whole.*
+*Why: code you can see whole is code you can understand whole, and a person or
+an AI agent finds a feature by the area it belongs to.*
 
 ## Practice
 

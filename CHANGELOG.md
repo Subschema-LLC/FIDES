@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased
+
+### Rules
+
+- **Rule 16, small and shallow,** allows feature groups:
+  `features/<group>/<use_case>/file`. A group is named for the area people
+  look for (usually a screen or menu entry), holds no code, and leaves the use
+  case as the owner, so features in one group still never call each other.
+  Groups are optional; once a project uses them, every feature sits in one.
+  Found while porting the alerts area of a Symfony app, where nine features
+  under one flat folder were hard to browse.
+
+### Docs
+
+- `structure.md`: a section on feature groups, the depth exception, and a
+  glossary entry. `ai.md`: the one-page rules mention groups.
+- The example checkers still require `features/<use_case>/file`. The examples
+  are small and use no groups, and a stricter checker is still a correct one.
+
 ## 0.3 (2026-11-17)
 
 Findings from mapping a Symfony 7.4 app (about 450 PHP files, a DI container,
