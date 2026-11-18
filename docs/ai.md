@@ -75,7 +75,8 @@ This app follows FIDES. Run `<check command>` before you finish.
     belongs to the feature that handles it. A feature view never renders
     another's. CSS and JS are feature-specific in features/, global in layout,
     and page-specific in the page folder (never inline).
-12. At most zone/owner/file deep (pages: delivery/web/<page>/file).
+12. At most zone/owner/file deep (pages: delivery/web/<page>/file; grouped
+    features: features/<group>/<use_case>/file, all or none, no code in a group).
     Small files, short lines. Keep one casing (snake_case or PascalCase)
     consistent across folders, code, views, .css, .js and config/.
 13. Comments say what is true now. History goes in the commit message.
