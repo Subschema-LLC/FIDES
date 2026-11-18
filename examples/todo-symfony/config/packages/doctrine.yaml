@@ -1,0 +1,20 @@
+# Doctrine maps only the record class in src/Integrations/Database. The
+# TodoItem entity carries no mapping and knows nothing of Doctrine.
+# A database URL with a password comes from the environment only.
+parameters:
+    default_database_url: 'sqlite:///%kernel.project_dir%/var/todos.sqlite'
+
+doctrine:
+    dbal:
+        url: '%env(default:default_database_url:DATABASE_URL)%'
+    orm:
+        mappings:
+            Database:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Integrations/Database'
+                prefix: 'App\Integrations\Database'
+
+when@test:
+    parameters:
+        default_database_url: 'sqlite:///%kernel.project_dir%/var/test.sqlite'

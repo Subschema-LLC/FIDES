@@ -18,12 +18,14 @@ from entities.course.course_settings import CourseSettings
 from features.drop.drop import Drop
 from features.enroll.enroll import Enroll
 from features.list_courses.list_courses import ListCourses
+from features.list_roster.list_roster import ListRoster
 from features.send_enrollment_confirmation.send_enrollment_confirmation import (
     SendEnrollmentConfirmation,
 )
 from features.transfer.transfer import Transfer
 from integrations.clock.system_clock import SystemClock
 from integrations.config.config_loader import ConfigLoader, LoadedSettings
+from integrations.database.class_roster import SqlClassRoster
 from integrations.database.connection import Connection
 from integrations.database.course_store import SqlCourseStore
 from integrations.database.outbox import Outbox
@@ -39,6 +41,7 @@ class Wiring:
     app: AppSettings
     settings: dict[str, LoadedSettings]  # by owner, for `python3 app.py config <owner>`
     list_courses: ListCourses
+    list_roster: ListRoster
     enroll: Enroll
     drop: Drop
     transfer: Transfer
@@ -70,6 +73,7 @@ def build(root: Path, environ: Mapping[str, str] | None = None) -> Wiring:
         app=app,
         settings=settings,
         list_courses=ListCourses(courses),
+        list_roster=ListRoster(SqlClassRoster(connection)),
         enroll=Enroll(students, courses, course_settings, clock),
         drop=Drop(courses),
         transfer=Transfer(courses, course_settings, SqlUnitOfWork(connection), clock),

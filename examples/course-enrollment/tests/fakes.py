@@ -8,6 +8,7 @@ from typing import Callable, TypeVar
 
 from entities.course.course import Course
 from entities.student.student import Student
+from shared.class_roster.class_roster import RosterRow
 
 T = TypeVar("T")
 
@@ -68,3 +69,11 @@ class RecordingMailer:
 
     def send(self, to: str, subject: str, body: str) -> None:
         self.sent.append((to, subject))
+
+
+class FakeClassRoster:
+    def __init__(self, *rows: RosterRow) -> None:
+        self._rows = list(rows)
+
+    def rows(self) -> list[RosterRow]:
+        return self._rows

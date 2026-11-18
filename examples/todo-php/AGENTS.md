@@ -26,6 +26,7 @@ This app follows FIDES. Run `php arch-check.php` and
    (`final class TodoMissing extends \RuntimeException`), never
    another custom exception. A built-in exception with a clear
    message is usually enough, as everywhere in this app today.
+   No traits either: they put a class's behavior in another file.
 2. **Entities hold rules that are true everywhere.** An entity
    imports only its own folder. It owns what it must keep
    consistent and saves in a single store write. (TodoItem owns its

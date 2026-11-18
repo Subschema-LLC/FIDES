@@ -4,6 +4,7 @@ Usage: python3 app.py <command> [arguments]
 
   courses                                list courses and seats
   students                               list students who can enroll
+  roster                                 list who is enrolled in each course
   enroll   <student_id> <course_code>    enroll a student
   drop     <student_id> <course_code>    drop a student from a course
   transfer <student_id> <from> <to>      move a student between courses
@@ -42,6 +43,9 @@ def _run(wiring: Wiring, command: str, args: list[str]) -> int:
     if command == "courses":
         for row in wiring.list_courses.execute():
             print(f"{row.code:<8} {row.title:<24} {row.seats_taken}/{row.capacity} taken")
+    elif command == "roster":
+        for line in wiring.list_roster.execute():
+            print(f"{line.course:<30} {line.student:<20} since {line.enrolled_on}")
     elif command == "students":
         for choice in wiring.enroll.form().students:
             print(f"{choice.value:>3}  {choice.label}")

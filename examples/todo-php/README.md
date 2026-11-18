@@ -12,7 +12,8 @@ web pages that compose feature views with colocated CSS and JS, one
 store contract, declared settings with overrides, and an
 architecture check that fails the build when the shape breaks.
 The course-enrollment example shows the same rules at larger
-scale, in Python.
+scale, in Python, and the todo-symfony example runs this app's
+entities and features unchanged inside Symfony.
 
 ## Run it
 
@@ -43,6 +44,7 @@ matching PSR-4 namespaces 1:1 on disk (`Entities/TodoItem/TodoItem.php`,
 ```
 AGENTS.md                                  # the rules, one page, for AI agents and humans
 arch-check.php                             # fails the build on rule violations
+arch-check-inheritance.php                 # its extends and trait checks, read from PHP tokens
 app.php                                    # the command-line door
 autoload.php                               # PSR-4 autoloader for App\* -> src/*
 public/
@@ -109,6 +111,7 @@ src/
         Todo.js                            # keyboard shortcut (/) to focus the new to-do input
 tests/
   run.php                                  # architecture check + unit, config, store & web tests
+  arch-check-cases.php                     # runs the check on a throwaway tree of rule breaks
 var/                                       # todos.sqlite lives here (not committed)
 ```
 
@@ -127,7 +130,8 @@ var/                                       # todos.sqlite lives here (not commit
 - **No inheritance.** There is no `extends` anywhere in `src/`,
   and arch-check fails if one appears. The one `extends` it
   allows is a custom exception extending a built-in exception,
-  because PHP only throws `Throwable`s; this app needs none.
+  because PHP only throws `Throwable`s; this app needs none. A
+  trait in a class body fails the check too.
 - **Time is passed in.** Features take the time from the Clock
   contract and hand it to the entity, so a test can state exactly
   what "now" means.

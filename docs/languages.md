@@ -31,9 +31,15 @@ directories and files on disk (PHP with PSR-4, C#).
   never another custom exception. It is the one `extends` the check allows.
   Until a caller needs to catch a case on its own, throw a built-in exception
   with a clear message.
+- **Traits:** they count as inheritance, so none in the core. A trait the
+  framework requires (Symfony's `MicroKernelTrait` on the kernel) sits at the
+  edge, listed in the check. Read tokens to find them: a `use` directly in a
+  class body is a trait, while a closure's `use ($x)` sits deeper, inside a
+  method.
 - **Enforcement:** Deptrac, or a short script that reads `use` statements and
-  fails on any `extends` except a built-in exception parent. Run PHPStan or
-  Psalm in the same build, level 5 or higher.
+  PHP tokens and fails on any trait and any `extends` except a built-in
+  exception parent (the example's `arch-check-inheritance.php`). Run PHPStan
+  or Psalm in the same build, level 5 or higher.
 - **Views:** Mustache is logic-less. Twig and Blade escape by default but
   allow logic, so keep it out by review. Plain PHP templates need no
   dependency and every PHP developer reads them, but they can run any code
@@ -66,7 +72,8 @@ directories and files on disk (PHP with PSR-4, C#).
   `Layout.js`) so the renderer and build check match every colocated file by
   folder name without mixing cases.
 
-See [the PHP example app](../examples/todo-php).
+See [the PHP example app](../examples/todo-php), and the same app inside
+Symfony with Doctrine and Twig ([todo-symfony](../examples/todo-symfony)).
 
 ## Python
 
@@ -74,7 +81,8 @@ See [the PHP example app](../examples/todo-php).
   properties. Python cannot enforce privacy, so rule 1 relies on convention
   and review.
 - **Contract:** `typing.Protocol`. Implementations match it by shape and do not
-  inherit from it.
+  inherit from it. A mixin is a base class, so the check refuses it like any
+  other.
 - **Value:** `@dataclass(frozen=True)` that checks itself in `__post_init__`.
 - **Custom error:** Python only raises exceptions, so a custom error subclasses
   one built-in exception (`class CourseFull(ValueError)`), never another
@@ -96,7 +104,8 @@ See [the example app](../examples/course-enrollment).
 - **Value:** a class with `readonly` fields, frozen with `Object.freeze`.
 - **Custom error:** JavaScript can throw any value, but only an `Error` carries
   a stack trace, so a custom error is `class CourseFull extends Error`, the one
-  `extends` allowed.
+  `extends` allowed. A class-factory mixin (`class Course extends
+  Timestamped(Base)`) is an `extends` like any other, and is refused.
 - **Enforcement:** dependency-cruiser or eslint-plugin-boundaries, plus
   `tsc --strict`.
 - **Note:** FIDES fits the Node backend. For the browser app itself, see

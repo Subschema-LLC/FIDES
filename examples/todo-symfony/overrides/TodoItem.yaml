@@ -1,0 +1,6 @@
+# Operator overrides for the TodoItem entity. Symfony owns config/; this
+# folder belongs to whoever runs the app, and no code update writes it.
+# The defaults live in src/Entities/TodoItem/TodoItemSettings.php; this
+# file overrides only what it names, and an undeclared key stops startup.
+# The environment wins over this file (TODOITEM_LIST_LIMIT).
+list_limit: 25

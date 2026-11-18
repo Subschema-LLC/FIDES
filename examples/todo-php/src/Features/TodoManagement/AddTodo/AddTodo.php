@@ -6,7 +6,7 @@ use App\Entities\TodoItem\TodoItemStore;
 use App\Shared\Clock;
 
 /** Add one to-do. The entity checks the title; the store keeps it.
- *  The form that submits to this feature lives beside it in AddTodoView.php. */
+ *  The form that submits to this feature lives beside it, in its view. */
 final class AddTodo
 {
     public function __construct(

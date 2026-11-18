@@ -55,6 +55,7 @@ This app follows FIDES. Run `<check command>` before you finish.
 - CSS or JS for a feature, page, frame  -> the feature folder, page folder, or layout
 - A new way the app reaches the world   -> src/integrations/, behind a contract
 - A contract no single entity owns      -> src/shared/
+- A read across two entities or more    -> a read model in src/shared/<name>/
 - A setting                             -> declared in the owner's settings
 - An override for a setting             -> config/<Owner> (never in src/)
 

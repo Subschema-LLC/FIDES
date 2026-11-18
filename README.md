@@ -65,6 +65,7 @@ AGENTS.md            # the rules on one page, for AI agents and people
 config/              # overrides only, one file per owner
 src/
   shared/            # ownerless contracts: UnitOfWork, Clock, Mailer, MessageBus
+    class_roster/    # a read model: a read-only query across entities
   entities/
     course/          # Course, its values, messages, settings, store contract
     student/
@@ -125,11 +126,11 @@ More in [docs/why.md](docs/why.md).
 9. [Inside a framework](docs/frameworks.md): containers, `config/`, compiled
    settings and base classes in Symfony, Laravel, Rails, Spring and others
 
-## Example
+## Examples
 
 [examples/course-enrollment](examples/course-enrollment) is a small Python app
 (standard library only) where students enroll in, drop and transfer between
-courses. It shows every rule in working code, with 35 tests, an architecture
+courses. It shows every rule in working code, with 38 tests, an architecture
 check, and a type check when mypy is installed.
 
 ```bash
@@ -137,6 +138,12 @@ cd examples/course-enrollment
 python3 run_tests.py          # architecture check, type check, tests
 python3 app.py serve          # http://127.0.0.1:8080
 ```
+
+[examples/todo-php](examples/todo-php) is a very small to-do app in plain PHP
+with no dependencies. [examples/todo-symfony](examples/todo-symfony) is the
+same app inside Symfony 7.4 with Doctrine ORM and Twig: its entities and
+features are the plain PHP example's, byte for byte, and only integrations,
+delivery and templates change.
 
 ## Contributing
 

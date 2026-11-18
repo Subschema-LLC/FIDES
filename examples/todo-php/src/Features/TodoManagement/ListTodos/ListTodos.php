@@ -7,7 +7,7 @@ use App\Entities\TodoItem\TodoItemStore;
 
 /** Show the to-do list, newest first, up to the entity's list limit.
  *  This feature also shapes plain TodoRow and TodoSummary records so
- *  ListTodosView.php displays values without touching TodoItem. */
+ *  the ListTodos view displays values without touching TodoItem. */
 final class ListTodos
 {
     public function __construct(

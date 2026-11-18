@@ -75,6 +75,10 @@ FIDES is not free. Know the costs before adopting it:
   page-specific CSS and JS, and each feature it shows keeps its own view, CSS
   and JS. Finding a button means asking which feature handles it. In exchange,
   nothing on a page is owned twice.
+- **Reads across entities need a read model.** A screen that joins entities
+  gets its own query contract and one integration query, instead of walking
+  from one object to the next. In exchange, reads never bend the rules that
+  guard writes.
 - **A checker to maintain.** The rules only hold if the build enforces them.
 - **New habits.** The outbox and "one write by default" take a little getting
   used to if you are used to sending email from a controller.

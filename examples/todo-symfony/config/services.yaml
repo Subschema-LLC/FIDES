@@ -1,0 +1,19 @@
+# Symfony's container. Features and delivery are registered from src/ and
+# autowired by type. Integrations are not registered here: config/wiring.yaml
+# is the one file that names them and binds each contract to one of them.
+imports:
+    - { resource: wiring.yaml }
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/Delivery/Kernel.php'
+            - '../src/Entities/'
+            - '../src/Integrations/'
+            - '../src/Shared/'
+            - '../src/Features/*/*/{TodoRow,TodoSummary}.php'

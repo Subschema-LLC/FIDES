@@ -22,8 +22,10 @@ the seats taken must always match them.
 *Why: a rule can never be half-applied.*
 
 **3. Entities stand alone.** An entity imports only its own folder. It refers
-to other entities by identity (an id or a key), never by holding them.
-**(checkable)**
+to other entities by identity (an id or a key), never by holding them. A
+screen that needs several entities at once reads them through a read model, a
+read-only query contract in shared ([structure.md](structure.md#read-models)),
+never by one entity holding another. **(checkable)**
 *Why: any entity can be read, tested and changed without opening another.*
 
 ## Features
@@ -58,12 +60,15 @@ change least (the rules), never the reverse.*
 protocols or traits, and implementations fulfill them without extending
 anything. If a framework forces you to subclass one of its types, keep that
 class at the edge (delivery or integrations), thin and with no rules in it.
-One allowance holds in every zone: where an error has to extend the
+Code mixed into a class counts as inheritance too (PHP traits, Python mixin
+classes, TypeScript class-factory mixins, Ruby modules): it puts a unit's
+behavior in another file. None in the core; one a framework requires stays at
+the edge, like a required base class. A Rust trait is a contract, not a
+mixin. One allowance holds in every zone: where an error has to extend the
 language's built-in exception type to be thrown, or to carry a stack trace
 (PHP, Python, Java, C#, JavaScript), a custom error may extend one built-in
 exception type, never another custom error. Often no custom error is needed:
-a built-in exception with a clear message is enough.
-**(checkable)**
+a built-in exception with a clear message is enough. **(checkable)**
 *Why: what a unit does is in the unit, not spread up a chain of parents. A
 custom error that extends a built-in one adds a name to catch, not a chain to
 climb.*
@@ -145,7 +150,10 @@ touches.*
 **16. Small and shallow.** Never deeper than `zone/owner/file`. The one extra
 level is a page in delivery: `delivery/web/<page>/file`. Files stay under
 about 200 lines, lines under about 100 characters. Split by concept, never by
-kind of code. **(checkable)**
+kind of code, and name the concept: files called `part1` and `part2` hide it.
+A file that is data, not logic (a lookup table, generated code), may skip the
+size limits when the checker lists it with its reason, in one place where
+review sees it. Logic never does. **(checkable)**
 *Why: code you can see whole is code you can understand whole.*
 
 ## Practice

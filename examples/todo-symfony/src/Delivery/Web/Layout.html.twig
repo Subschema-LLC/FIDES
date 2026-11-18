@@ -1,0 +1,28 @@
+{# The outer frame every page sits in. Renderer passes the page's HTML as
+   content and the stylesheets and scripts in FIDES order: layout first,
+   then rendered features, then the page. #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
+{% for href in styles %}
+  <link rel="stylesheet" href="{{ href }}">
+{% endfor %}
+</head>
+<body>
+  <header class="site-header">
+    <a class="site-brand" href="/">FIDES To-dos (Symfony)</a>
+  </header>
+{% if flash != '' %}
+  <p class="flash" data-flash role="status">{{ flash }}</p>
+{% endif %}
+  <main class="site-main">
+{{ content|raw }}
+  </main>
+{% for src in scripts %}
+  <script src="{{ src }}" defer></script>
+{% endfor %}
+</body>
+</html>

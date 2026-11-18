@@ -10,6 +10,7 @@ from delivery.worker.worker import Worker
 from entities.course.course import Course
 from entities.course.course_settings import CourseSettings
 from integrations.config.config_loader import ConfigLoader, merge
+from integrations.database.class_roster import SqlClassRoster
 from integrations.database.connection import Connection
 from integrations.database.course_store import SqlCourseStore
 from integrations.database.outbox import Outbox
@@ -32,6 +33,15 @@ class DatabaseTest(unittest.TestCase):
         self.courses.save(course)
         self.assertTrue(self.courses.find("ENG105").has_student(3))
         self.assertEqual([m.name for m in self.outbox.pending()], ["StudentEnrolled"])
+
+    def test_class_roster_reads_courses_and_students_in_one_query(self) -> None:
+        course = self.courses.find("ENG105")
+        course.enroll(3, NOW)
+        self.courses.save(course)
+        rows = SqlClassRoster(self.connection).rows()
+        self.assertEqual(len(rows), 4)  # three seeded enrollments, plus this one
+        self.assertIn(("ENG105", "Chen Wei", NOW),
+                      [(r.course_code, r.student_name, r.enrolled_at) for r in rows])
 
     def test_second_of_two_simultaneous_saves_fails(self) -> None:
         first, second = self.courses.find("CS101"), self.courses.find("CS101")

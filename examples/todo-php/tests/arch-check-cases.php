@@ -1,19 +1,26 @@
 <?php
 /** Runs arch-check.php on a throwaway tree: a custom exception may extend
- *  one built-in exception, and any other `extends` fails the check.
+ *  one built-in exception; any other `extends` and any trait fail the check;
+ *  a closure's `use` is not a trait.
  *  php tests/arch-check-cases.php */
 
 $tree = sys_get_temp_dir() . '/fides-arch-' . bin2hex(random_bytes(4));
 mkdir($tree . '/Entities/Thing', 0777, true);
-$declarations = [
-    'ThingMissing' => 'class ThingMissing extends \RuntimeException',
-    'ThingGone' => 'final class ThingGone extends ThingMissing',
-    'Thing' => 'final class Thing extends Model',
+$bodies = [
+    'ThingMissing' => "class ThingMissing extends \\RuntimeException\n{\n}",
+    'ThingGone' => "final class ThingGone extends ThingMissing\n{\n}",
+    'Thing' => "final class Thing extends Model\n{\n}",
+    'ThingCounter' => "final class ThingCounter\n{\n    use Counts;\n\n"
+        . "    public function adder(int \$step): \\Closure\n    {\n"
+        . "        return static fn(int \$n): int => \$n + \$step;\n    }\n\n"
+        . "    public function adderToo(int \$step): \\Closure\n    {\n"
+        . "        return static function (int \$n) use (\$step): int {\n"
+        . "            return \$n + \$step;\n        };\n    }\n}",
 ];
-foreach ($declarations as $name => $declaration) {
+foreach ($bodies as $name => $body) {
     file_put_contents(
         "$tree/Entities/Thing/$name.php",
-        "<?php\n\nnamespace App\\Entities\\Thing;\n\n$declaration\n{\n}\n"
+        "<?php\n\nnamespace App\\Entities\\Thing;\n\n$body\n"
     );
 }
 
@@ -30,10 +37,15 @@ $cases = [
     'a built-in parent passes' => !str_contains($report, 'ThingMissing.php: extends'),
     'a custom exception parent fails' => str_contains($report, 'ThingGone.php: extends'),
     'any other parent fails' => str_contains($report, 'Thing.php: extends Model'),
+    'a trait fails' => str_contains($report, 'ThingCounter.php: uses trait Counts'),
+    'a closure use is not a trait' => substr_count($report, 'uses trait') === 1,
     'the check exits 1' => $exit === 1,
 ];
 $failed = array_keys(array_filter($cases, static fn(bool $ok): bool => !$ok));
 foreach ($failed as $name) {
     echo "FAIL: arch-check case: $name\n";
+}
+if ($failed !== []) {
+    echo $report, "\n";
 }
 exit($failed === [] ? 0 : 1);
