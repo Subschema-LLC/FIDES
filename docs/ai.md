@@ -81,6 +81,32 @@ This app follows FIDES. Run `<check command>` before you finish.
     consistent across folders, code, views, .css, .js and config/.
 13. Comments say what is true now. History goes in the commit message.
 
+## Naming
+A name is a promise. If the code drifts from the name, that is a defect.
+- Guess before you look: a reader who knows the domain should be able to
+  guess a feature's path, and a file's contents from its name alone. If
+  they cannot, rename it.
+- Say it out loud: full words, no abbreviations, nothing clever. A name
+  should survive being spoken in a sentence. Length is fine; ambiguity
+  is not.
+- One word per concept: the domain's nouns and verbs, spelled the same in
+  folders, classes, files, methods, routes and tests. If the business
+  says "cancel", the code never also says "void" or "revoke" for the
+  same act.
+- Grammar carries meaning: features and use cases are verb phrases
+  (IssueInvoice). Entities are plain nouns (Invoice). Methods read as
+  sentences at the call site ($invoice->markPaid()). A method that
+  answers yes or no is a question (hasBalanceDue(), isOverdue()).
+- Empty words are banned: Manager, Helper, Utils, Handler, Processor,
+  Data, Info, Misc. They say nothing; banning them puts the meaning in
+  the name. A check can flag these.
+- "And" means two jobs: split the unit. If a name needs a comment to say
+  what the thing is, the name failed; fix the name, not the comment.
+- Tests are named as the rule they check (invoice_total_includes_tax,
+  subscription_cannot_cancel_twice). The suite reads as the spec.
+- When a convention from the wider ecosystem fights readability,
+  readability wins.
+
 If a change touches more than its feature folder, the entities it names,
 one integration and wiring, stop and ask whether something is spread too far.
 ```
