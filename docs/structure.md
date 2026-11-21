@@ -222,6 +222,7 @@ who handles it, and nothing on the page is owned twice.
 | `config/` | Setting overrides, one file per owner, owned by whoever runs the app (a folder of their own where the framework already uses `config/`: see [frameworks.md](frameworks.md#the-config-folder)) |
 | `tests/` | Entity tests (no fakes), feature tests (with fakes), integration tests |
 | `AGENTS.md` | The rules on one page, for AI agents and people |
+| `docs/decisions/` | Decisions no unit in `src/` owns, one short file each ([comments.md](comments.md#decisions-no-unit-owns)) |
 | the checker | A script that fails the build when a rule is broken |
 | `var/` | Runtime files (local database, logs), never committed |
 

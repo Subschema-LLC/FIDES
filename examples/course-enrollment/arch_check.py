@@ -16,6 +16,9 @@ Run it in the build so a person or an AI agent cannot quietly break a rule.
                each with its reason, skip the size limits; logic never does)
   Pages        each folder in delivery/web/ is one page: <page>.py, plus files named
                <page>.html, <page>.css, <page>.js or <page>_<part>.<ext>
+  Comments     every .py file opens with a docstring, every "Decision: <name>" has a
+               docs/decisions/<name>.md, every docs/....md a comment names exists,
+               and every TODO names its issue: TODO(#123)
 
 Two presentation rules need no check here because string.Template cannot break
 them: a template cannot name an entity, and a feature's view cannot render
@@ -25,6 +28,7 @@ run code.
 
 import ast
 import builtins
+import re
 import sys
 from pathlib import Path
 
@@ -40,16 +44,36 @@ MAX_LINE, MAX_LINES, MAX_DEPTH = 100, 200, 3
 SIZE_EXEMPT: dict[str, str] = {}
 BUILTIN_EXCEPTIONS = {name for name, value in vars(builtins).items()
                       if isinstance(value, type) and issubclass(value, BaseException)}
+DECISION = re.compile(r"Decision: (\w+)")
+DOC_PATH = re.compile(r"\bdocs/[\w./-]+\.md\b")
+TODO_WITHOUT_ISSUE = re.compile(r"\bTODO\b(?!\([^)\s]+\))")
 
 
-def check(src: Path) -> list[str]:
+def check(src: Path, decisions: Path | None = None) -> list[str]:
+    decisions = decisions or src.parent / "docs" / "decisions"
     problems = []
     for path in sorted(src.rglob("*")):
         if path.is_file() and path.suffix in (".py", ".html", ".css", ".js"):
-            problems += check_spread(src, path)
+            problems += check_spread(src, path) + check_comments(src, path, decisions)
             if path.suffix == ".py":
                 problems += check_python(src, path)
     return problems + check_pages(src / "delivery" / "web")
+
+
+def check_comments(src: Path, path: Path, decisions: Path) -> list[str]:
+    rel = path.relative_to(src)
+    problems = []
+    for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+        for name in DECISION.findall(line):
+            if not (decisions / f"{name}.md").is_file():
+                problems.append(f"{rel}:{number}: names decision {name}, "
+                                f"but docs/decisions/{name}.md does not exist")
+        for doc in DOC_PATH.findall(line):
+            if not (src.parent / doc).is_file():
+                problems.append(f"{rel}:{number}: names {doc}, which does not exist")
+        if TODO_WITHOUT_ISSUE.search(line):
+            problems.append(f"{rel}:{number}: a TODO names its issue: TODO(#123)")
+    return problems
 
 
 def check_spread(src: Path, path: Path) -> list[str]:
@@ -91,6 +115,8 @@ def check_python(src: Path, path: Path) -> list[str]:
     owner = rel.parts[1] if len(rel.parts) > 2 else ""
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(rel))
     problems = []
+    if not ast.get_docstring(tree):
+        problems.append(f"{rel}: no header; open with a docstring that says what it does")
     for node in ast.walk(tree):
         if isinstance(node, ast.ImportFrom) and node.level > 0:
             problems.append(f"{rel}:{node.lineno}: relative import; use the full path")
@@ -167,4 +193,4 @@ if __name__ == "__main__":
     if found:
         print("arch_check FAILED:\n  " + "\n  ".join(found), file=sys.stderr)
         raise SystemExit(1)
-    print("arch_check OK: imports, purity, no inheritance, spread, pages")
+    print("arch_check OK: imports, purity, no inheritance, spread, pages, comments")

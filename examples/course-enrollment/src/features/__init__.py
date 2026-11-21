@@ -1,1 +1,1 @@
-"""FIDES zone: features. See docs/02-zones.md in the repository root."""
+"""FIDES zone: features, one use case each. They import entities and shared, never a feature."""

@@ -19,7 +19,7 @@ python3 app.py transfer 2 MATH120 ENG105  # two courses change in one UnitOfWork
 python3 app.py work                       # send confirmation emails (to var/mail.log)
 python3 app.py config Course              # each setting and where its value came from
 python3 app.py serve                      # web app on http://127.0.0.1:8080
-python3 run_tests.py                      # architecture check, type check, 38 tests
+python3 run_tests.py                      # architecture check, type check, 39 tests
 ```
 
 Delete `var/app.sqlite` to start over with the demo data.
@@ -30,6 +30,7 @@ Delete `var/app.sqlite` to start over with the demo data.
 AGENTS.md          # the rules, one page, for AI agents and humans
 arch_check.py      # fails the build on rule violations (run by run_tests.py)
 config/            # overrides only, one file per owner; belongs to whoever runs the app
+docs/decisions/    # decisions no unit in src/ owns: standard_library_only.md
   app.toml         #   overrides AppSettings
   Course.toml      #   overrides CourseSettings
 src/

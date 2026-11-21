@@ -1,1 +1,1 @@
-"""FIDES zone: shared. See docs/02-zones.md in the repository root."""
+"""FIDES zone: shared, contracts no entity owns. It imports nothing else from the app."""

@@ -1,1 +1,1 @@
-"""FIDES zone: entities. See docs/02-zones.md in the repository root."""
+"""FIDES zone: entities, the rules true everywhere. Each imports only its own folder."""
