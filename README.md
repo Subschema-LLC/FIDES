@@ -63,6 +63,7 @@ aid, not a constraint. If a zone is ever added or renamed, the name stays.
 ```
 AGENTS.md            # the rules on one page, for AI agents and people
 config/              # overrides only, one file per owner
+docs/decisions/      # decisions no unit in src/ owns, one short file each
 src/
   shared/            # ownerless contracts: UnitOfWork, Clock, Mailer, MessageBus
     class_roster/    # a read model: a read-only query across entities
@@ -119,18 +120,20 @@ More in [docs/why.md](docs/why.md).
 4. [Changes and messages](docs/changes.md): transactions, the outbox, concurrency
 5. [Configuration](docs/configuration.md): defaults, overrides, environment
 6. [Working with AI](docs/ai.md): AGENTS.md, the build check, reading order
-7. [Language notes](docs/languages.md): FIDES in PHP, Python, TypeScript, Java,
+7. [Comments and decisions](docs/comments.md): the file header, what a comment
+   says, and decision records
+8. [Language notes](docs/languages.md): FIDES in PHP, Python, TypeScript, Java,
    C#, Go and Rust
-8. [Moving an existing app](docs/migrating.md): change the structure and prove
+9. [Moving an existing app](docs/migrating.md): change the structure and prove
    nothing else changed
-9. [Inside a framework](docs/frameworks.md): containers, `config/`, compiled
-   settings and base classes in Symfony, Laravel, Rails, Spring and others
+10. [Inside a framework](docs/frameworks.md): containers, `config/`, compiled
+    settings and base classes in Symfony, Laravel, Rails, Spring and others
 
 ## Examples
 
 [examples/course-enrollment](examples/course-enrollment) is a small Python app
 (standard library only) where students enroll in, drop and transfer between
-courses. It shows every rule in working code, with 38 tests, an architecture
+courses. It shows every rule in working code, with 39 tests, an architecture
 check, and a type check when mypy is installed.
 
 ```bash

@@ -1,1 +1,1 @@
-"""FIDES zone: integrations. See docs/02-zones.md in the repository root."""
+"""FIDES zone: integrations, how the app reaches the world. Imports entities and shared only."""

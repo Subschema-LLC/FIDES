@@ -66,8 +66,11 @@ integration, stop and ask whether a concept is being spread too far.
 12. **Keep it close and small.** At most `zone/owner/file` deep (pages:
     `delivery/web/<page>/file`), lines up to 100 characters, files up to 200
     lines. Split by concept, never by kind of code.
-13. **Comments say what is true now.** What changed and why goes in the commit
-    message, not in the code.
+13. **Explanations sit with what they explain.** Every file opens with a
+    docstring: what it does, then why. Comments say what is true now; what
+    changed goes in the commit message. A decision no unit owns is a file in
+    `docs/decisions/`, named in code as `Decision: <name>`. A TODO names its
+    issue: `TODO(#123)`.
 
 ## Before you finish
 

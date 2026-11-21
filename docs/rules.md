@@ -184,3 +184,14 @@ strict setting. An `AGENTS.md` states the rules on one page.
 or AI, can quietly skip. A rule the build does not check drifts: in a
 production app moved onto FIDES, the size limits were written down but not
 checked, and they were not kept.*
+
+**19. Explanations sit with what they explain.** Every code file opens with a
+header: what the unit does, then the reasons the code cannot show. Comments
+say why, and what is true now; history goes in the commit message. A decision
+no unit owns gets a short record in `docs/decisions/`, and code names it as
+`Decision: <name>`, never by number. A TODO names the issue that owns it.
+**(checkable)**
+*Why: whoever opens one file gets the reasons with the code, and a reference
+the build checks cannot point at something that is gone.*
+
+Details: [comments.md](comments.md).

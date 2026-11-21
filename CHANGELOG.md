@@ -11,6 +11,12 @@
   Groups are optional; once a project uses them, every feature sits in one.
   Found while porting the alerts area of a Symfony app, where nine features
   under one flat folder were hard to browse.
+- **Rule 19, explanations sit with what they explain** (new). Every code file
+  opens with a header saying what it does and why. Comments say why, and what
+  is true now. A decision no unit owns gets a short record in
+  `docs/decisions/`, named in code as `Decision: <name>`, never by number.
+  A TODO names its issue. The one-page rules had "comments say what is true
+  now" as rule 13 with no counterpart in `rules.md`; this is that rule, grown.
 
 ### Docs
 
@@ -18,6 +24,20 @@
   glossary entry. `ai.md`: the one-page rules mention groups.
 - The example checkers still require `features/<use_case>/file`. The examples
   are small and use no groups, and a stricter checker is still a correct one.
+- `comments.md` (new): where each explanation goes, the file header, comments
+  in code, decision records that keep only what is true now, and why this
+  suits agents. `README.md`, `structure.md` and `ai.md` point to it, and the
+  `AGENTS.md` template's rule 13 says the same in brief.
+
+### Examples
+
+- The Python example's checker requires a docstring in every file, checks
+  that every `Decision: <name>` and every `docs/` path a comment names exists,
+  and requires an issue on every TODO. It has one decision record,
+  `standard_library_only.md`.
+- Its zone files pointed at `docs/02-zones.md`, which does not exist. The new
+  check caught all five; they now say what their zone may import.
+- The PHP examples do not check comments yet.
 
 ## 0.3 (2026-11-17)
 

@@ -1,1 +1,1 @@
-"""FIDES zone: delivery. See docs/02-zones.md in the repository root."""
+"""FIDES zone: delivery, how the world reaches the app. Only wiring imports integrations."""

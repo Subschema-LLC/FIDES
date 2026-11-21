@@ -62,7 +62,7 @@ class ArchitectureTest(unittest.TestCase):
 
 
     def test_a_listed_data_file_may_pass_the_size_limits(self) -> None:
-        table = "PATTERNS = [\n" + "    'bot',\n" * 250 + "]\n"
+        table = '"""Bot names."""\nPATTERNS = [\n' + "    'bot',\n" * 250 + "]\n"
         exempt = {"integrations/bots/patterns.py": "a lookup table, not logic"}
         with tempfile.TemporaryDirectory() as folder:
             src = Path(folder)
@@ -72,7 +72,30 @@ class ArchitectureTest(unittest.TestCase):
             with mock.patch.dict(arch_check.SIZE_EXEMPT, exempt):
                 problems = "\n".join(check(src))
         self.assertNotIn("patterns.py", problems)
-        self.assertIn("rules.py: 252 lines", problems)
+        self.assertIn("rules.py: 253 lines", problems)
+
+    def test_headers_decisions_and_todos(self) -> None:
+        files = {
+            "src/features/drop/drop.py": "x = 1\n",
+            "src/features/enroll/enroll.py": '"""Enroll."""\n# TODO: a waitlist\n',
+            "src/features/transfer/transfer.py": '"""Move."""\n# TODO(#142): a waitlist\n',
+            "src/integrations/database/store.py": '"""S."""\n# Gone (Decision: no_soft_deletes)\n',
+            "src/integrations/database/seeder.py": '"""Seed."""\n# Demo (Decision: demo_data)\n',
+            "src/shared/__init__.py": '"""Zone: shared. See docs/02-zones.md."""\n',
+            "docs/decisions/demo_data.md": "# Demo data\n",
+        }
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            for rel, text in files.items():
+                (root / rel).parent.mkdir(parents=True, exist_ok=True)
+                (root / rel).write_text(text, encoding="utf-8")
+            problems = "\n".join(check(root / "src"))
+        self.assertIn("features/drop/drop.py: no header", problems)
+        self.assertIn("enroll.py:2: a TODO names its issue", problems)
+        self.assertNotIn("transfer.py", problems)
+        self.assertIn("names decision no_soft_deletes, but docs/decisions/", problems)
+        self.assertNotIn("demo_data", problems)
+        self.assertIn("shared/__init__.py:1: names docs/02-zones.md, which does not", problems)
 
 
 if __name__ == "__main__":

@@ -14,6 +14,9 @@ codebase. The properties that help a new developer help an agent even more.
   feature folder. Agents stop inventing new layers.
 - **Good code to imitate.** Agents copy the nearest example. When every
   feature has the same shape, the nearest example is a correct one.
+- **Reasons travel with the code.** Every file opens with what it does and
+  why, so an agent that opens one file has the reasons too, and does not
+  "fix" a choice made on purpose ([comments.md](comments.md)).
 - **Rules a machine can check.** An agent can run the check itself and fix
   what it broke before you ever see it.
 
@@ -79,7 +82,10 @@ This app follows FIDES. Run `<check command>` before you finish.
     features: features/<group>/<use_case>/file, all or none, no code in a group).
     Small files, short lines. Keep one casing (snake_case or PascalCase)
     consistent across folders, code, views, .css, .js and config/.
-13. Comments say what is true now. History goes in the commit message.
+13. Every file opens with what it does and why. Comments say why, and what
+    is true now; history goes in the commit message. A decision no unit owns
+    goes in docs/decisions/<name>.md and is named in code as
+    `Decision: <name>`. A TODO names its issue: TODO(#123).
 
 If a change touches more than its feature folder, the entities it names,
 one integration and wiring, stop and ask whether something is spread too far.

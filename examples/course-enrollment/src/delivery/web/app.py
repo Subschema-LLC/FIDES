@@ -38,6 +38,7 @@ def make_app(wiring: Wiring) -> Callable[[dict[str, Any], StartResponse], Iterab
 
 
 def serve(wiring: Wiring, port: int) -> None:
+    # A development server, not one for production (Decision: standard_library_only).
     with make_server("127.0.0.1", port, make_app(wiring)) as server:
         print(f"Serving {wiring.app.title} on http://127.0.0.1:{port} (Ctrl+C to stop)")
         server.serve_forever()
